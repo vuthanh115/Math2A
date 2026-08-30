@@ -1293,12 +1293,12 @@
       function getImagePaths(pageIndex) {
         const pad3 = String(pageIndex).padStart(3, '0');
         return [
-          `images/page_${pageIndex}.png`,
-          `images/page_${pad3}.png`,
-          `images/page_${pad3} .png`,
           `page_${pad3} .png`,
           `page_${pad3}.png`,
-          `page_${pageIndex}.png`
+          `page_${pageIndex}.png`,
+          `images/page_${pageIndex}.png`,
+          `images/page_${pad3}.png`,
+          `images/page_${pad3} .png`
         ];
       }
 
