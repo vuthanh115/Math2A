@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Math 2A" />
+  <meta name="theme-color" content="#1e293b" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Math 2A - Trình Đọc & Viết Sách Toán Cho iPad / Apple Pencil</title>
+  <style>
+    /* ==========================================================================
+       1. CSS RESET & DESIGN SYSTEM (TỐI ƯU CHO IPAD RETINA & DESKTOP)
+       ========================================================================== */
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --bg-canvas: #090d16;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent: #38bdf8;
+      --accent-hover: #0ea5e9;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --bookmark-color: #f59e0b;
+      --danger-color: #ef4444;
+      --success-color: #10b981;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --sidebar-width: 310px;
+      --header-height: 56px;
+      --dock-height: 62px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-pill: 9999px;
+      --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.45);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+      --transition-fast: 0.15s ease;
+      --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Chế độ bộ lọc màu sách */
+    .filter-normal { filter: none !important; }
+    .filter-sepia { filter: sepia(0.35) contrast(0.95) brightness(0.95) !important; }
+    .filter-dark { filter: invert(0.9) hue-rotate(180deg) contrast(1.1) !important; }
+    .filter-high-contrast { filter: contrast(1.3) brightness(1.05) !important; }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      height: 100vh;
+      height: 100dvh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      inset: 0;
+    }
+
+    /* ==========================================================================
+       2. THANH CÔNG CỤ TRÊN CÙNG (HEADER TOOLBAR)
+       ========================================================================== */
+    .header {
+      height: var(--header-height);
+      background-color: rgba(30, 41, 59, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 40;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-left, .header-center, .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-primary);
+    }
+
+    .app-title span.badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      font-weight: 600;
+    }
+
+    /* Nút bấm (Buttons) */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      height: 38px;
+      min-width: 38px;
+      padding: 0 10px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      gap: 6px;
+      touch-action: manipulation;
+    }
+
+    .btn:active {
+      transform: scale(0.94);
+    }
+
+    .btn.active {
+      background: var(--accent);
+      color: #04121e;
+      font-weight: 600;
+      border-color: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .btn-icon {
+      padding: 0;
+      width: 38px;
+      height: 38px;
+    }
+
+    .btn-icon svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .btn-draw-toggle {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      border-color: rgba(56, 189, 248, 0.35);
+      font-weight: 600;
+    }
+
+    .btn-draw-toggle.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+
+    .divider {
+      width: 1px;
+      height: 22px;
+      background: var(--border-color);
+      margin: 0 4px;
+    }
+
+    /* Ô chuyển trang */
+    .page-nav-box {
+      display: flex;
+      align-items: center;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 2px 8px;
+      height: 38px;
+      gap: 6px;
+      font-size: 13px;
+    }
+
+    .page-input {
+      width: 44px;
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+    }
+
+    .page-total {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .zoom-level {
+      font-size: 12px;
+      font-weight: 600;
+      min-width: 44px;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
+    /* ==========================================================================
+       3. KHUNG CHÍNH (SIDEBAR & SÁCH TOÁN)
+       ========================================================================== */
+    .workspace {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - var(--header-height));
+      height: calc(100dvh - var(--header-height));
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      flex-shrink: 0;
+      transition: transform var(--transition-normal);
+      z-index: 30;
+    }
+
+    .sidebar.collapsed {
+      transform: translateX(-100%);
+      position: absolute;
+      bottom: 0;
+      top: 0;
+      left: 0;
+    }
+
+    .sidebar-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 4px;
+      font-size: 12px;
+      font-weight: 600;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border-bottom: 2px solid transparent;
+      transition: all var(--transition-fast);
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: rgba(56, 189, 248, 0.05);
+    }
+
+    .tab-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .tab-content {
+      flex: 1;
+      overflow-y: auto;
+      display: none;
+      padding: 12px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .sidebar-search {
+      padding: 6px 0 10px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      padding: 8px 12px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .thumbnails-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .thumb-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 6px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+
+    .thumb-card.active {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.1);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .thumb-img-wrap {
+      width: 100%;
+      height: 130px;
+      background: #000;
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .thumb-img.loaded {
+      opacity: 1;
+    }
+
+    .thumb-footer {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .thumb-badge-bookmark, .thumb-badge-note, .thumb-badge-ink {
+      display: none;
+      margin-left: 2px;
+    }
+
+    .thumb-card.has-bookmark .thumb-badge-bookmark { display: inline; color: var(--bookmark-color); }
+    .thumb-card.has-note .thumb-badge-note { display: inline; color: var(--accent); }
+    .thumb-card.has-ink .thumb-badge-ink { display: inline; color: var(--success-color); }
+
+    .bookmarks-list, .notes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bookmark-item, .note-item {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: border-color var(--transition-fast);
+    }
+
+    .bookmark-item:hover, .note-item:hover {
+      border-color: var(--accent);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 36px 16px;
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* ==========================================================================
+       4. BỘ CANVAS & KHUNG TRÌNH DIỄN (VIEWER & CANVAS OVERLAY)
+       ========================================================================== */
+    .viewer-container {
+      flex: 1;
+      height: 100%;
+      background-color: var(--bg-canvas);
+      position: relative;
+      overflow: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .viewer-container.mode-pan {
+      cursor: grab;
+    }
+
+    .viewer-container.mode-pan:active {
+      cursor: grabbing;
+    }
+
+    /* Sân khấu sách: Giữ ảnh và canvas đồng bộ 100% */
+    .book-stage {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: center center;
+      transition: transform 0.05s ease-out;
+      box-shadow: var(--shadow-lg);
+      border-radius: 6px;
+      overflow: visible;
+      background: #fff;
+    }
+
+    .main-book-img {
+      display: block;
+      max-width: 92vw;
+      max-height: calc(100vh - var(--header-height) - 40px);
+      max-height: calc(100dvh - var(--header-height) - 40px);
+      width: auto;
+      height: auto;
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    /* Canvas vẽ phủ lên toàn bộ bề mặt ảnh */
+    .draw-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+      z-index: 10;
+      touch-action: none !important; /* Bắt buộc để vô hiệu hoá gesture Safari */
+    }
+
+    .draw-canvas.drawing-disabled {
+      pointer-events: none;
+    }
+
+    /* Chế độ cuộn liên tục */
+    .continuous-wrapper {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 30px 16px 120px;
+      width: 100%;
+      min-height: 100%;
+    }
+
+    .continuous-page-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      box-shadow: var(--shadow-md);
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .continuous-page-card .page-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .continuous-img {
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+    }
+
+    /* Nút chuyển trang nổi */
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 46px;
+      height: 64px;
+      background: rgba(30, 41, 59, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 25;
+      opacity: 0.35;
+      transition: all var(--transition-fast);
+    }
+
+    .nav-arrow:hover, .nav-arrow:active {
+      opacity: 1;
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+
+    .nav-prev { left: 16px; }
+    .nav-next { right: 16px; }
+
+    .nav-arrow svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    /* ==========================================================================
+       5. THANH CÔNG CỤ VẼ DOCK NỔI CHO IPAD (FLOATING APPLE PENCIL DOCK)
+       ========================================================================== */
+    .draw-dock {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: var(--radius-pill);
+      height: var(--dock-height);
+      padding: 6px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 35;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 20px rgba(56, 189, 248, 0.2);
+      transition: transform var(--transition-normal), opacity var(--transition-normal);
+    }
+
+    .draw-dock.dock-hidden {
+      transform: translateX(-50%) translateY(120px);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .dock-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+
+    .dock-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .dock-btn:active {
+      transform: scale(0.9);
+    }
+
+    .dock-btn.active {
+      background: var(--accent);
+      color: #04121e;
+      border-color: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .dock-btn:disabled {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    /* Bảng chọn màu (Color Palette Dots) */
+    .color-picker-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 4px 8px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-color);
+    }
+
+    .color-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-pill);
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform var(--transition-fast);
+    }
+
+    .color-dot:active {
+      transform: scale(0.85);
+    }
+
+    .color-dot.active {
+      transform: scale(1.18);
+      border-color: #ffffff;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+    }
+
+    /* Chọn nét bút (Size Slider) */
+    .size-slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 4px;
+    }
+
+    .size-slider {
+      width: 70px;
+      height: 4px;
+      -webkit-appearance: none;
+      background: var(--bg-tertiary);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    .size-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 6px var(--accent-glow);
+    }
+
+    /* Badge chống chạm lòng bàn tay (Palm rejection status) */
+    .palm-status-badge {
+      font-size: 11px;
+      color: var(--success-color);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: var(--radius-pill);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ==========================================================================
+       6. DRAWER GHI CHÚ, MODAL & TOAST
+       ========================================================================== */
+    .note-panel-drawer {
+      position: absolute;
+      right: 16px;
+      bottom: 20px;
+      width: 320px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      z-index: 36;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform var(--transition-normal), opacity var(--transition-normal);
+    }
+
+    .note-panel-drawer.collapsed {
+      transform: translateY(calc(100% + 24px));
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .note-panel-header {
+      padding: 10px 14px;
+      background: var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .note-textarea {
+      width: 100%;
+      height: 120px;
+      padding: 10px;
+      background: var(--bg-primary);
+      border: none;
+      color: var(--text-primary);
+      font-size: 13px;
+      line-height: 1.4;
+      resize: vertical;
+      outline: none;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .note-panel-footer {
+      padding: 6px 12px;
+      background: var(--bg-secondary);
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-color);
+    }
+
+    /* Modal Hướng dẫn */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-normal);
+    }
+
+    .modal-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      width: 520px;
+      max-width: 92vw;
+      box-shadow: var(--shadow-lg);
+      padding: 24px;
+      color: var(--text-primary);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+    }
+
+    .shortcuts-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+
+    .shortcuts-table td {
+      padding: 8px 4px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .shortcuts-table td:last-child {
+      text-align: right;
+    }
+
+    kbd {
+      background: var(--bg-tertiary);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-family: monospace;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(50px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--accent);
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      pointer-events: none;
+      transition: transform var(--transition-normal), opacity var(--transition-normal);
+      opacity: 0;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Responsive cho iPad dọc & Mobile */
+    @media (max-width: 860px) {
+      .app-title span.text { display: none; }
+      .btn-label { display: none; }
+      .palm-status-badge { display: none; }
+      .draw-dock {
+        bottom: 12px;
+        padding: 4px 10px;
+        gap: 6px;
+        height: 54px;
+      }
+      .dock-btn { width: 38px; height: 38px; }
+      .color-dot { width: 20px; height: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       HEADER: THANH ĐIỀU HÀNH
+       ========================================================================== -->
+  <header class="header">
+    <div class="header-left">
+      <button id="btnToggleSidebar" class="btn btn-icon" title="Thanh bên (M)">
+        <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </button>
+
+      <div class="app-title">
+        <svg style="width:20px;height:20px;fill:var(--accent)" viewBox="0 0 24 24">
+          <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
+        </svg>
+        <span class="text">Math 2A</span>
+        <span class="badge">112 Trang</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- NÚT BẬT / TẮT CHẾ ĐỘ VẼ APPLE PENCIL -->
+      <button id="btnToggleDrawMode" class="btn btn-draw-toggle active" title="Bật/Tắt Vẽ Bút (P)">
+        <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24">
+          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+        </svg>
+        <span class="btn-label">Chế độ Vẽ</span>
+      </button>
+
+      <!-- Đổi chế độ xem -->
+      <button id="btnToggleViewMode" class="btn" title="Chuyển chế độ xem (V)">
+        <svg style="width:16px;height:16px;fill:currentColor" viewBox="0 0 24 24">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
+        </svg>
+        <span class="btn-label" id="viewModeLabel">Đơn trang</span>
+      </button>
+    </div>
+
+    <!-- ĐIỀU HƯỚNG TRANG -->
+    <div class="header-center">
+      <button id="btnPrevPage" class="btn btn-icon" title="Trang trước (← hoặc A)">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </button>
+
+      <div class="page-nav-box">
+        <span>Trang</span>
+        <input type="number" id="pageInput" class="page-input" min="1" max="112" value="1" />
+        <span class="page-total">/ 112</span>
+      </div>
+
+      <button id="btnNextPage" class="btn btn-icon" title="Trang sau (→ hoặc D)">
+        <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+      </button>
+    </div>
+
+    <!-- CÔNG CỤ XEM, BỘ LỌC, BOOKMARK -->
+    <div class="header-right">
+      <button id="btnColorFilter" class="btn btn-icon" title="Chế độ đọc: Chuẩn / Sepia / Đêm">
+        <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.49 0-.37-.14-.7-.37-.97-.23-.26-.38-.61-.38-1.04 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-4.97-4.03-9-10-9z"/></svg>
+      </button>
+
+      <button id="btnZoomOut" class="btn btn-icon" title="Thu nhỏ (-)">
+        <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+      </button>
+
+      <span id="zoomLabel" class="zoom-level">100%</span>
+
+      <button id="btnZoomIn" class="btn btn-icon" title="Phóng to (+)">
+        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      </button>
+
+      <button id="btnZoomReset" class="btn btn-icon" title="Kích thước gốc (0)">
+        <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+      </button>
+
+      <button id="btnRotate" class="btn btn-icon" title="Xoay ảnh 90° (R)">
+        <svg viewBox="0 0 24 24"><path d="M7.34 6.41L.86 12.88l1.41 1.41 4.96-4.96v11.39h2V9.33l4.96 4.96 1.41-1.41L9.12 6.41c-.49-.49-1.29-.49-1.78 0zM21 16.5c0-2.48-2.02-4.5-4.5-4.5s-4.5 2.02-4.5 4.5 2.02 4.5 4.5 4.5 4.5-2.02 4.5-4.5z"/></svg>
+      </button>
+
+      <div class="divider"></div>
+
+      <button id="btnBookmark" class="btn btn-icon" title="Đánh dấu trang (B)">
+        <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+      </button>
+
+      <button id="btnToggleNoteDrawer" class="btn btn-icon" title="Ghi chú trang (N)">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      </button>
+
+      <button id="btnFullscreen" class="btn btn-icon" title="Toàn màn hình (F)">
+        <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      </button>
+
+      <button id="btnHelp" class="btn btn-icon" title="Hướng dẫn (?)">
+        <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       WORKSPACE: SIDEBAR & VIEWER
+       ========================================================================== -->
+  <main class="workspace">
+
+    <!-- THANH BÊN -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-tabs">
+        <button class="tab-btn active" data-tab="tabThumbnails">
+          <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+          Trang
+        </button>
+        <button class="tab-btn" data-tab="tabBookmarks">
+          <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+          Đánh dấu (<span id="bookmarkCount">0</span>)
+        </button>
+        <button class="tab-btn" data-tab="tabNotes">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+          Ghi chú (<span id="notesCount">0</span>)
+        </button>
+      </div>
+
+      <div id="tabThumbnails" class="tab-content active">
+        <div class="sidebar-search">
+          <input type="text" id="thumbSearch" class="search-input" placeholder="Tìm số trang (1 - 112)..." />
+        </div>
+        <div id="thumbnailsContainer" class="thumbnails-grid"></div>
+      </div>
+
+      <div id="tabBookmarks" class="tab-content">
+        <div id="bookmarksList" class="bookmarks-list"></div>
+      </div>
+
+      <div id="tabNotes" class="tab-content">
+        <div id="notesList" class="notes-list"></div>
+      </div>
+    </aside>
+
+    <!-- TRÌNH HIỂN THỊ TRANG SÁCH & CANVAS VẼ CHUYÊN DỤNG -->
+    <section id="viewerContainer" class="viewer-container">
+      
+      <!-- Nút lùi/tiến nổi -->
+      <div id="floatPrev" class="nav-arrow nav-prev" title="Trang trước (←)">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </div>
+      <div id="floatNext" class="nav-arrow nav-next" title="Trang sau (→)">
+        <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+      </div>
+
+      <!-- KHUNG ĐƠN TRANG KÈM LỚP CANVAS TRÙNG KHỚP 100% -->
+      <div id="bookStage" class="book-stage">
+        <img id="mainBookImage" class="main-book-img filter-normal" alt="Trang sách Math 2A" />
+        <!-- Canvas vẽ kỹ thuật số chuyên sâu -->
+        <canvas id="drawCanvas" class="draw-canvas"></canvas>
+      </div>
+
+      <!-- CHẾ ĐỘ CUỘN LIÊN TỤC -->
+      <div id="continuousWrapper" class="continuous-wrapper"></div>
+
+      <!-- THANH DOCK CÔNG CỤ VẼ APPLE PENCIL CHO IPAD -->
+      <div id="drawDock" class="draw-dock">
+        <!-- Chế độ Bút viết (Pen) -->
+        <button id="toolPen" class="dock-btn active" title="Bút viết (P)">
+          <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        </button>
+
+        <!-- Bút dạ quang / Đánh dấu (Highlighter) -->
+        <button id="toolHighlighter" class="dock-btn" title="Bút dạ quang / Tô sáng (H)">
+          <svg viewBox="0 0 24 24"><path d="M6 14l3 3v5h6v-5l3-3V9H6v5zm5-12h2v3h-2V2zM3.5 5.9l1.4-1.4 2.1 2.1-1.4 1.4L3.5 5.9zm13.5 2.1l2.1-2.1 1.4 1.4-2.1 2.1-1.4-1.4z"/></svg>
+        </button>
+
+        <!-- Cục tẩy (Eraser) -->
+        <button id="toolEraser" class="dock-btn" title="Cục tẩy (E)">
+          <svg viewBox="0 0 24 24"><path d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.78.78-.78 2.05 0 2.83L5.03 20H18c.55 0 1-.45 1-1s-.45-1-1-1h-4.17l5.72-5.72c.78-.78.78-2.05 0-2.83l-4.41-4.41c-.39-.39-.9-.59-1.41-.59zM7.86 18l-3.86-3.86L14.73 3.41 18.59 7.27 7.86 18z"/></svg>
+        </button>
+
+        <div class="divider" style="height:28px;"></div>
+
+        <!-- Bảng chọn màu -->
+        <div class="color-picker-group">
+          <div class="color-dot active" data-color="#111827" style="background:#111827;" title="Đen"></div>
+          <div class="color-dot" data-color="#ef4444" style="background:#ef4444;" title="Đỏ"></div>
+          <div class="color-dot" data-color="#2563eb" style="background:#2563eb;" title="Xanh dương"></div>
+          <div class="color-dot" data-color="#10b981" style="background:#10b981;" title="Xanh lá"></div>
+          <div class="color-dot" data-color="#f59e0b" style="background:#f59e0b;" title="Cam / Vàng"></div>
+        </div>
+
+        <!-- Chỉnh độ dày nét -->
+        <div class="size-slider-wrap" title="Độ dày nét">
+          <input type="range" id="brushSize" class="size-slider" min="1" max="24" value="3" />
+        </div>
+
+        <div class="divider" style="height:28px;"></div>
+
+        <!-- Hoàn tác (Undo) -->
+        <button id="btnUndo" class="dock-btn" title="Hoàn tác (Ctrl+Z)" disabled>
+          <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+        </button>
+
+        <!-- Làm lại (Redo) -->
+        <button id="btnRedo" class="dock-btn" title="Làm lại (Ctrl+Y)" disabled>
+          <svg viewBox="0 0 24 24"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>
+        </button>
+
+        <!-- Xóa toàn bộ nét vẽ trang hiện tại -->
+        <button id="btnClearCanvas" class="dock-btn" title="Xóa sạch nét vẽ trang này">
+          <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        </button>
+
+        <!-- Badge chống chạm lòng bàn tay (Palm Rejection) -->
+        <div class="palm-status-badge" title="Chỉ nhận bút Apple Pencil khi vẽ, ngón tay để cuộn">
+          <svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          Palm Rejection
+        </div>
+      </div>
+
+      <!-- BẢNG GHI CHÚ NỔI -->
+      <div id="notePanelDrawer" class="note-panel-drawer collapsed">
+        <div class="note-panel-header">
+          <span>✎ Ghi chú Trang <strong id="notePageNumber">1</strong></span>
+          <button id="btnCloseNoteDrawer" class="btn btn-icon" style="height:24px;width:24px;">✕</button>
+        </div>
+        <textarea id="pageNoteInput" class="note-textarea" placeholder="Nhập ghi chú cho trang này..."></textarea>
+        <div class="note-panel-footer">
+          <span id="noteSaveStatus">Đã lưu tự động</span>
+          <button id="btnClearNote" class="btn" style="height:22px;padding:0 6px;font-size:10px;">Xóa</button>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- MODAL HƯỚNG DẪN -->
+  <div id="helpModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-title">
+        <svg style="width:22px;height:22px;fill:currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+        Hướng dẫn Apple Pencil & Phím tắt
+      </div>
+      <table class="shortcuts-table">
+        <tr><td><b>Vẽ Bút & Cảm ứng lực</b></td><td>Dùng Apple Pencil nhấn mạnh/nhẹ nét tự co giãn</td></tr>
+        <tr><td><b>Chống chạm lòng bàn tay</b></td><td>Tỳ tay tự nhiên lên màn hình iPad khi viết</td></tr>
+        <tr><td>Bật / Tắt vẽ nhanh</td><td><kbd>P</kbd> hoặc nút "Chế độ Vẽ"</td></tr>
+        <tr><td>Bút viết / Dạ quang / Tẩy</td><td><kbd>1</kbd> Pen, <kbd>2</kbd> Highlighter, <kbd>3</kbd> Eraser</td></tr>
+        <tr><td>Hoàn tác / Làm lại</td><td><kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd></td></tr>
+        <tr><td>Lùi / Tiến trang</td><td><kbd>←</kbd> / <kbd>→</kbd> hoặc chạm mũi tên mép màn hình</td></tr>
+        <tr><td>Toàn màn hình</td><td><kbd>F</kbd></td></tr>
+      </table>
+      <div style="text-align: right;">
+        <button id="btnCloseHelpModal" class="btn" style="background:var(--accent);color:#000;font-weight:600;padding:0 16px;">Đã hiểu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Thông báo</div>
+
+  <!-- ==========================================================================
+       7. JAVASCRIPT: INDEXEDDB STORAGE & ADVANCED CANVAS ENGINE
+       ========================================================================== */ -->
+  <script>
+    /**
+     * TRÌNH ĐỌC & VẼ SÁCH TOÁN MATH 2A - TỐI ƯU IPAD & APPLE PENCIL
+     * 100% Offline, Pointer Events, Palm Rejection, Quadratic Smooth Ink, IndexedDB Storage.
+     */
+    (function () {
+      'use strict';
+
+      // --- CẤU HÌNH HỆ THỐNG ---
+      const CONFIG = {
+        TOTAL_PAGES: 112,
+        ZOOM_STEP: 0.15,
+        MIN_ZOOM: 0.5,
+        MAX_ZOOM: 3.0,
+        DB_NAME: 'Math2A_Book_DB',
+        DB_VERSION: 1,
+        STORE_CANVAS: 'canvas_drawings',
+        STORAGE_KEYS: {
+          LAST_PAGE: 'math2a_last_page',
+          BOOKMARKS: 'math2a_bookmarks',
+          NOTES: 'math2a_notes',
+          VIEW_MODE: 'math2a_view_mode',
+          COLOR_FILTER: 'math2a_color_filter'
+        }
+      };
+
+      // --- TRẠNG THÁI ỨNG DỤNG ---
+      const state = {
+        currentPage: 1,
+        zoom: 1.0,
+        rotation: 0,
+        viewMode: 'single', // 'single' | 'continuous'
+        colorFilterIndex: 0,
+        colorFilters: ['filter-normal', 'filter-sepia', 'filter-dark', 'filter-high-contrast'],
+        colorFilterNames: ['Chuẩn', 'Sepia (Dịu mắt)', 'Chế độ đêm', 'Tương phản cao'],
+        bookmarks: new Set(),
+        notes: {},
+        pagesWithInk: new Set(), // Danh sách các trang có nét vẽ
+        // Drawing engine state
+        isDrawingMode: true,
+        activeTool: 'pen', // 'pen' | 'highlighter' | 'eraser'
+        currentColor: '#111827',
+        brushSize: 3,
+        isDrawing: false,
+        lastPoints: [],
+        undoStack: [],
+        redoStack: [],
+        maxHistory: 25
+      };
+
+      // --- DOM ELEMENTS ---
+      const DOM = {
+        viewerContainer: document.getElementById('viewerContainer'),
+        bookStage: document.getElementById('bookStage'),
+        mainBookImage: document.getElementById('mainBookImage'),
+        drawCanvas: document.getElementById('drawCanvas'),
+        continuousWrapper: document.getElementById('continuousWrapper'),
+        drawDock: document.getElementById('drawDock'),
+        floatPrev: document.getElementById('floatPrev'),
+        floatNext: document.getElementById('floatNext'),
+        pageInput: document.getElementById('pageInput'),
+        btnPrevPage: document.getElementById('btnPrevPage'),
+        btnNextPage: document.getElementById('btnNextPage'),
+        btnToggleDrawMode: document.getElementById('btnToggleDrawMode'),
+        btnZoomIn: document.getElementById('btnZoomIn'),
+        btnZoomOut: document.getElementById('btnZoomOut'),
+        btnZoomReset: document.getElementById('btnZoomReset'),
+        zoomLabel: document.getElementById('zoomLabel'),
+        btnRotate: document.getElementById('btnRotate'),
+        btnColorFilter: document.getElementById('btnColorFilter'),
+        btnToggleViewMode: document.getElementById('btnToggleViewMode'),
+        viewModeLabel: document.getElementById('viewModeLabel'),
+        btnToggleSidebar: document.getElementById('btnToggleSidebar'),
+        btnBookmark: document.getElementById('btnBookmark'),
+        btnFullscreen: document.getElementById('btnFullscreen'),
+        btnHelp: document.getElementById('btnHelp'),
+        // Drawing tools
+        toolPen: document.getElementById('toolPen'),
+        toolHighlighter: document.getElementById('toolHighlighter'),
+        toolEraser: document.getElementById('toolEraser'),
+        brushSize: document.getElementById('brushSize'),
+        btnUndo: document.getElementById('btnUndo'),
+        btnRedo: document.getElementById('btnRedo'),
+        btnClearCanvas: document.getElementById('btnClearCanvas'),
+        // Sidebar
+        sidebar: document.getElementById('sidebar'),
+        thumbnailsContainer: document.getElementById('thumbnailsContainer'),
+        thumbSearch: document.getElementById('thumbSearch'),
+        bookmarksList: document.getElementById('bookmarksList'),
+        bookmarkCount: document.getElementById('bookmarkCount'),
+        notesList: document.getElementById('notesList'),
+        notesCount: document.getElementById('notesCount'),
+        // Note Drawer
+        notePanelDrawer: document.getElementById('notePanelDrawer'),
+        btnToggleNoteDrawer: document.getElementById('btnToggleNoteDrawer'),
+        btnCloseNoteDrawer: document.getElementById('btnCloseNoteDrawer'),
+        notePageNumber: document.getElementById('notePageNumber'),
+        pageNoteInput: document.getElementById('pageNoteInput'),
+        noteSaveStatus: document.getElementById('noteSaveStatus'),
+        btnClearNote: document.getElementById('btnClearNote'),
+        // Modals
+        helpModal: document.getElementById('helpModal'),
+        btnCloseHelpModal: document.getElementById('btnCloseHelpModal'),
+        toast: document.getElementById('toast')
+      };
+
+      const ctx = DOM.drawCanvas.getContext('2d', { willReadFrequently: true });
+
+      // ==========================================================================
+      // 1. INDEXEDDB STORAGE ENGINE (LƯU TRỮ NÉT VẼ KHÔNG GIỚI HẠN DUNG LƯỢNG)
+      // ==========================================================================
+      let dbInstance = null;
+
+      function initIndexedDB() {
+        return new Promise((resolve) => {
+          const request = indexedDB.open(CONFIG.DB_NAME, CONFIG.DB_VERSION);
+          request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(CONFIG.STORE_CANVAS)) {
+              db.createObjectStore(CONFIG.STORE_CANVAS, { keyPath: 'page' });
+            }
+          };
+          request.onsuccess = (e) => {
+            dbInstance = e.target.result;
+            scanPagesWithInk();
+            resolve(dbInstance);
+          };
+          request.onerror = () => {
+            console.warn('IndexedDB không thể khởi tạo, chuyển sang chế độ memory cache.');
+            resolve(null);
+          };
+        });
+      }
+
+      function saveCanvasToDB(pageNumber, dataUrl) {
+        if (!dbInstance) return;
+        const tx = dbInstance.transaction(CONFIG.STORE_CANVAS, 'readwrite');
+        const store = tx.objectStore(CONFIG.STORE_CANVAS);
+        if (dataUrl) {
+          store.put({ page: pageNumber, data: dataUrl, updated: Date.now() });
+          state.pagesWithInk.add(pageNumber);
+        } else {
+          store.delete(pageNumber);
+          state.pagesWithInk.delete(pageNumber);
+        }
+        updateSidebarBadges();
+      }
+
+      function loadCanvasFromDB(pageNumber) {
+        return new Promise((resolve) => {
+          if (!dbInstance) return resolve(null);
+          const tx = dbInstance.transaction(CONFIG.STORE_CANVAS, 'readonly');
+          const store = tx.objectStore(CONFIG.STORE_CANVAS);
+          const req = store.get(pageNumber);
+          req.onsuccess = () => resolve(req.result ? req.result.data : null);
+          req.onerror = () => resolve(null);
+        });
+      }
+
+      function scanPagesWithInk() {
+        if (!dbInstance) return;
+        const tx = dbInstance.transaction(CONFIG.STORE_CANVAS, 'readonly');
+        const store = tx.objectStore(CONFIG.STORE_CANVAS);
+        const req = store.getAllKeys();
+        req.onsuccess = () => {
+          if (req.result) {
+            state.pagesWithInk = new Set(req.result);
+            updateSidebarBadges();
+          }
+        };
+      }
+
+      // ==========================================================================
+      // 2. TẢI ẢNH THÔNG MINH (SMART IMAGE PATH RESOLVER)
+      // ==========================================================================
+      function getImagePaths(pageIndex) {
+        const pad3 = String(pageIndex).padStart(3, '0');
+        return [
+          `images/page_${pageIndex}.png`,
+          `images/page_${pad3}.png`,
+          `images/page_${pad3} .png`,
+          `page_${pad3} .png`,
+          `page_${pad3}.png`,
+          `page_${pageIndex}.png`
+        ];
+      }
+
+      function setSmartImageSource(imgElement, pageIndex, onLoaded) {
+        const candidatePaths = getImagePaths(pageIndex);
+        let currentCandidate = 0;
+
+        function tryNextPath() {
+          if (currentCandidate < candidatePaths.length) {
+            imgElement.src = candidatePaths[currentCandidate++];
+          }
+        }
+
+        imgElement.onerror = () => tryNextPath();
+        imgElement.onload = () => {
+          imgElement.classList.add('loaded');
+          if (onLoaded) onLoaded();
+        };
+
+        tryNextPath();
+      }
+
+      // ==========================================================================
+      // 3. CANVAS OVERLAY & RETINA RESOLUTION SYNC
+      // ==========================================================================
+      function resizeCanvasToMatchImage() {
+        const img = DOM.mainBookImage;
+        const width = img.naturalWidth || img.clientWidth || 1000;
+        const height = img.naturalHeight || img.clientHeight || 1400;
+
+        if (width === 0 || height === 0) return;
+
+        // Lưu nét vẽ tạm trước khi đổi kích thước
+        const currentData = isCanvasBlank() ? null : DOM.drawCanvas.toDataURL();
+
+        DOM.drawCanvas.width = width;
+        DOM.drawCanvas.height = height;
+
+        if (currentData) {
+          const tempImg = new Image();
+          tempImg.onload = () => ctx.drawImage(tempImg, 0, 0);
+          tempImg.src = currentData;
+        }
+      }
+
+      function isCanvasBlank() {
+        const pixelBuffer = new Uint32Array(
+          ctx.getImageData(0, 0, DOM.drawCanvas.width, DOM.drawCanvas.height).data.buffer
+        );
+        return !pixelBuffer.some((color) => color !== 0);
+      }
+
+      // ==========================================================================
+      // 4. APPLE PENCIL & POINTER EVENTS ENGINE (PALM REJECTION & PRESSURE)
+      // ==========================================================================
+
+      function getCanvasCoordinates(e) {
+        const rect = DOM.drawCanvas.getBoundingClientRect();
+        const scaleX = DOM.drawCanvas.width / rect.width;
+        const scaleY = DOM.drawCanvas.height / rect.height;
+        return {
+          x: (e.clientX - rect.left) * scaleX,
+          y: (e.clientY - rect.top) * scaleY,
+          pressure: e.pressure !== undefined && e.pressure > 0 ? e.pressure : 0.5
+        };
+      }
+
+      function setupPointerDrawingEvents() {
+        const canvas = DOM.drawCanvas;
+
+        canvas.addEventListener('pointerdown', (e) => {
+          if (!state.isDrawingMode) return;
+
+          // PALM REJECTION: Nếu là cảm ứng ngón tay (touch), bỏ qua không vẽ
+          // Chỉ nhận diện Apple Pencil (pen) hoặc Chuột máy tính (mouse)
+          if (e.pointerType === 'touch') {
+            return;
+          }
+
+          e.preventDefault();
+          canvas.setPointerCapture(e.pointerId);
+
+          state.isDrawing = true;
+          saveHistoryState(); // Lưu undo snapshot trước khi vẽ nét mới
+
+          const point = getCanvasCoordinates(e);
+          state.lastPoints = [point];
+
+          // Bắt đầu cấu hình nét vẽ
+          applyBrushStyle(point.pressure);
+          ctx.beginPath();
+          ctx.arc(point.x, point.y, getDynamicLineWidth(point.pressure) / 2, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        canvas.addEventListener('pointermove', (e) => {
+          if (!state.isDrawing || !state.isDrawingMode) return;
+          if (e.pointerType === 'touch') return; // Chặn ngón tay vô tình di chuyển
+
+          e.preventDefault();
+          const currentPoint = getCanvasCoordinates(e);
+          state.lastPoints.push(currentPoint);
+
+          if (state.lastPoints.length > 2) {
+            const p1 = state.lastPoints[state.lastPoints.length - 2];
+            const p2 = currentPoint;
+            const midPoint = {
+              x: (p1.x + p2.x) / 2,
+              y: (p1.y + p2.y) / 2,
+              pressure: (p1.pressure + p2.pressure) / 2
+            };
+
+            applyBrushStyle(midPoint.pressure);
+
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            // Thuật toán đường cong mượt Quadratic Bezier Curve
+            ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+            ctx.stroke();
+          }
+        });
+
+        const stopDrawing = (e) => {
+          if (!state.isDrawing) return;
+          state.isDrawing = false;
+          state.lastPoints = [];
+
+          if (e && e.pointerId) {
+            try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+          }
+
+          // Tự động lưu nét vẽ vào IndexedDB
+          saveCurrentPageCanvas();
+          updateUndoRedoButtons();
+        };
+
+        canvas.addEventListener('pointerup', stopDrawing);
+        canvas.addEventListener('pointercancel', stopDrawing);
+        canvas.addEventListener('pointerleave', stopDrawing);
+      }
+
+      function getDynamicLineWidth(pressure) {
+        const base = state.brushSize;
+        if (state.activeTool === 'highlighter') {
+          return base * 6; // Bút dạ quang bản rộng
+        }
+        if (state.activeTool === 'eraser') {
+          return base * 8; // Tẩy kích thước to
+        }
+        // Apple Pencil Cảm ứng lực: Lực nhấn điều chỉnh từ 60% đến 150% độ dày
+        const pressureFactor = 0.6 + pressure * 0.9;
+        return Math.max(1, base * pressureFactor);
+      }
+
+      function applyBrushStyle(pressure) {
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.lineWidth = getDynamicLineWidth(pressure);
+
+        if (state.activeTool === 'pen') {
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.strokeStyle = state.currentColor;
+          ctx.fillStyle = state.currentColor;
+        } else if (state.activeTool === 'highlighter') {
+          ctx.globalCompositeOperation = 'source-over';
+          // Màu dạ quang trong suốt 40%
+          ctx.strokeStyle = hexToRgba(state.currentColor, 0.4);
+          ctx.fillStyle = hexToRgba(state.currentColor, 0.4);
+        } else if (state.activeTool === 'eraser') {
+          // Xóa chỉ làm trong suốt canvas, không đụng vào ảnh nền sách
+          ctx.globalCompositeOperation = 'destination-out';
+          ctx.strokeStyle = 'rgba(0,0,0,1)';
+          ctx.fillStyle = 'rgba(0,0,0,1)';
+        }
+      }
+
+      function hexToRgba(hex, alpha) {
+        let r = 0, g = 0, b = 0;
+        if (hex.startsWith('#')) {
+          if (hex.length === 4) {
+            r = parseInt(hex[1] + hex[1], 16);
+            g = parseInt(hex[2] + hex[2], 16);
+            b = parseInt(hex[3] + hex[3], 16);
+          } else if (hex.length === 7) {
+            r = parseInt(hex.slice(1, 3), 16);
+            g = parseInt(hex.slice(3, 5), 16);
+            b = parseInt(hex.slice(5, 7), 16);
+          }
+        }
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      }
+
+      // ==========================================================================
+      // 5. HOÀN TÁC / LÀM LẠI & QUẢN LÝ NÉT VẼ TRANG
+      // ==========================================================================
+      function saveHistoryState() {
+        if (state.undoStack.length >= state.maxHistory) {
+          state.undoStack.shift();
+        }
+        state.undoStack.push(ctx.getImageData(0, 0, DOM.drawCanvas.width, DOM.drawCanvas.height));
+        state.redoStack = []; // Xóa redo khi có nét vẽ mới
+        updateUndoRedoButtons();
+      }
+
+      function undo() {
+        if (state.undoStack.length === 0) return;
+        state.redoStack.push(ctx.getImageData(0, 0, DOM.drawCanvas.width, DOM.drawCanvas.height));
+        const previousState = state.undoStack.pop();
+        ctx.putImageData(previousState, 0, 0);
+        saveCurrentPageCanvas();
+        updateUndoRedoButtons();
+        showToast('Đã hoàn tác (Undo)');
+      }
+
+      function redo() {
+        if (state.redoStack.length === 0) return;
+        state.undoStack.push(ctx.getImageData(0, 0, DOM.drawCanvas.width, DOM.drawCanvas.height));
+        const nextState = state.redoStack.pop();
+        ctx.putImageData(nextState, 0, 0);
+        saveCurrentPageCanvas();
+        updateUndoRedoButtons();
+        showToast('Đã làm lại (Redo)');
+      }
+
+      function updateUndoRedoButtons() {
+        DOM.btnUndo.disabled = state.undoStack.length === 0;
+        DOM.btnRedo.disabled = state.redoStack.length === 0;
+      }
+
+      function clearCurrentCanvas() {
+        saveHistoryState();
+        ctx.clearRect(0, 0, DOM.drawCanvas.width, DOM.drawCanvas.height);
+        saveCurrentPageCanvas();
+        showToast(`Đã xóa sạch nét vẽ Trang ${state.currentPage}`);
+      }
+
+      function saveCurrentPageCanvas() {
+        if (isCanvasBlank()) {
+          saveCanvasToDB(state.currentPage, null);
+        } else {
+          const dataUrl = DOM.drawCanvas.toDataURL('image/png');
+          saveCanvasToDB(state.currentPage, dataUrl);
+        }
+      }
+
+      async function restorePageCanvas(pageNumber) {
+        ctx.clearRect(0, 0, DOM.drawCanvas.width, DOM.drawCanvas.height);
+        state.undoStack = [];
+        state.redoStack = [];
+        updateUndoRedoButtons();
+
+        const dataUrl = await loadCanvasFromDB(pageNumber);
+        if (dataUrl) {
+          const img = new Image();
+          img.onload = () => {
+            ctx.drawImage(img, 0, 0);
+          };
+          img.src = dataUrl;
+        }
+      }
+
+      // ==========================================================================
+      // 6. ĐIỀU HƯỚNG TRANG & RENDER SÁCH
+      // ==========================================================================
+      async function goToPage(pageNumber) {
+        const target = Math.max(1, Math.min(CONFIG.TOTAL_PAGES, parseInt(pageNumber, 10) || 1));
+
+        // 1. Tự động lưu trang hiện tại trước khi chuyển
+        saveCurrentPageCanvas();
+
+        state.currentPage = target;
+        DOM.pageInput.value = target;
+        try { localStorage.setItem(CONFIG.STORAGE_KEYS.LAST_PAGE, target); } catch (e) {}
+
+        // 2. Cập nhật nút bookmark & notes
+        DOM.btnBookmark.classList.toggle('active', state.bookmarks.has(target));
+        DOM.btnBookmark.style.color = state.bookmarks.has(target) ? 'var(--bookmark-color)' : '';
+        updateNoteDrawer();
+
+        // 3. Tải ảnh sách
+        setSmartImageSource(DOM.mainBookImage, target, () => {
+          resizeCanvasToMatchImage();
+          restorePageCanvas(target);
+          applyTransformations();
+        });
+
+        updateActiveThumbnail();
+      }
+
+      function nextPage() {
+        if (state.currentPage < CONFIG.TOTAL_PAGES) {
+          goToPage(state.currentPage + 1);
+        } else {
+          showToast('Đang ở trang cuối cùng (112)');
+        }
+      }
+
+      function prevPage() {
+        if (state.currentPage > 1) {
+          goToPage(state.currentPage - 1);
+        } else {
+          showToast('Đang ở trang đầu tiên (1)');
+        }
+      }
+
+      // ==========================================================================
+      // 7. ZOOM, XOAY & CHẾ ĐỘ XEM
+      // ==========================================================================
+      function applyTransformations() {
+        DOM.zoomLabel.textContent = `${Math.round(state.zoom * 100)}%`;
+        DOM.bookStage.style.transform = `scale(${state.zoom}) rotate(${state.rotation}deg)`;
+      }
+
+      function zoomIn() {
+        if (state.zoom < CONFIG.MAX_ZOOM) {
+          state.zoom = Math.min(CONFIG.MAX_ZOOM, state.zoom + CONFIG.ZOOM_STEP);
+          applyTransformations();
+        }
+      }
+
+      function zoomOut() {
+        if (state.zoom > CONFIG.MIN_ZOOM) {
+          state.zoom = Math.max(CONFIG.MIN_ZOOM, state.zoom - CONFIG.ZOOM_STEP);
+          applyTransformations();
+        }
+      }
+
+      function resetZoom() {
+        state.zoom = 1.0;
+        state.rotation = 0;
+        applyTransformations();
+        showToast('Kích thước chuẩn (100%)');
+      }
+
+      function rotatePage() {
+        state.rotation = (state.rotation + 90) % 360;
+        applyTransformations();
+        showToast(`Đã xoay: ${state.rotation}°`);
+      }
+
+      function toggleDrawMode() {
+        state.isDrawingMode = !state.isDrawingMode;
+        DOM.btnToggleDrawMode.classList.toggle('active', state.isDrawingMode);
+        DOM.drawDock.classList.toggle('dock-hidden', !state.isDrawingMode);
+        DOM.drawCanvas.classList.toggle('drawing-disabled', !state.isDrawingMode);
+        DOM.viewerContainer.classList.toggle('mode-pan', !state.isDrawingMode);
+
+        showToast(state.isDrawingMode ? 'Đã bật Chế độ Vẽ (Apple Pencil)' : 'Đã tắt Vẽ (Chế độ Xem/Cuộn)');
+      }
+
+      function cycleColorFilter() {
+        state.colorFilterIndex = (state.colorFilterIndex + 1) % state.colorFilters.length;
+        const currentFilterClass = state.colorFilters[state.colorFilterIndex];
+        DOM.mainBookImage.className = `main-book-img ${currentFilterClass}`;
+        try { localStorage.setItem(CONFIG.STORAGE_KEYS.COLOR_FILTER, state.colorFilterIndex); } catch (e) {}
+        showToast(`Chế độ màu: ${state.colorFilterNames[state.colorFilterIndex]}`);
+      }
+
+      // ==========================================================================
+      // 8. SIDEBAR THUMBNAILS, BOOKMARKS & NOTES
+      // ==========================================================================
+      function buildThumbnails() {
+        const fragment = document.createDocumentFragment();
+
+        for (let i = 1; i <= CONFIG.TOTAL_PAGES; i++) {
+          const card = document.createElement('div');
+          card.className = `thumb-card ${i === state.currentPage ? 'active' : ''}`;
+          card.id = `thumbCard_${i}`;
+          card.dataset.page = i;
+
+          const imgWrap = document.createElement('div');
+          imgWrap.className = 'thumb-img-wrap';
+
+          const img = document.createElement('img');
+          img.className = 'thumb-img';
+          img.loading = 'lazy';
+          setSmartImageSource(img, i);
+
+          imgWrap.appendChild(img);
+
+          const footer = document.createElement('div');
+          footer.className = 'thumb-footer';
+          footer.innerHTML = `
+            <span>Trang ${i}</span>
+            <div>
+              <span class="thumb-badge-ink" title="Có nét vẽ viết">✎</span>
+              <span class="thumb-badge-bookmark" title="Đã đánh dấu">★</span>
+              <span class="thumb-badge-note" title="Có ghi chú">📝</span>
+            </div>
+          `;
+
+          card.appendChild(imgWrap);
+          card.appendChild(footer);
+
+          card.addEventListener('click', () => goToPage(i));
+          fragment.appendChild(card);
+        }
+
+        DOM.thumbnailsContainer.appendChild(fragment);
+      }
+
+      function updateActiveThumbnail() {
+        document.querySelectorAll('.thumb-card').forEach((card) => {
+          const page = parseInt(card.dataset.page, 10);
+          if (page === state.currentPage) {
+            card.classList.add('active');
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          } else {
+            card.classList.remove('active');
+          }
+        });
+      }
+
+      function updateSidebarBadges() {
+        DOM.bookmarkCount.textContent = state.bookmarks.size;
+        let noteCount = 0;
+        for (const k in state.notes) {
+          if (state.notes[k] && state.notes[k].trim()) noteCount++;
+        }
+        DOM.notesCount.textContent = noteCount;
+
+        for (let i = 1; i <= CONFIG.TOTAL_PAGES; i++) {
+          const card = document.getElementById(`thumbCard_${i}`);
+          if (card) {
+            card.classList.toggle('has-bookmark', state.bookmarks.has(i));
+            card.classList.toggle('has-note', Boolean(state.notes[i] && state.notes[i].trim()));
+            card.classList.toggle('has-ink', state.pagesWithInk.has(i));
+          }
+        }
+
+        renderBookmarksList();
+        renderNotesList();
+      }
+
+      function renderBookmarksList() {
+        if (state.bookmarks.size === 0) {
+          DOM.bookmarksList.innerHTML = `<div class="empty-state">Chưa có trang nào được đánh dấu.<br>Nhấn biểu tượng lá cờ (B) để lưu.</div>`;
+          return;
+        }
+
+        const sorted = Array.from(state.bookmarks).sort((a, b) => a - b);
+        let html = '';
+        sorted.forEach((page) => {
+          html += `
+            <div class="bookmark-item" onclick="window.appGoToPage(${page})">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span><strong style="color:var(--bookmark-color)">★</strong> Trang ${page}</span>
+                <button class="btn btn-icon" style="height:24px;width:24px;" onclick="event.stopPropagation(); window.appRemoveBookmark(${page})">✕</button>
+              </div>
+            </div>
+          `;
+        });
+        DOM.bookmarksList.innerHTML = html;
+      }
+
+      function renderNotesList() {
+        const pagesWithNotes = Object.keys(state.notes)
+          .map(Number)
+          .filter((p) => state.notes[p] && state.notes[p].trim().length > 0)
+          .sort((a, b) => a - b);
+
+        if (pagesWithNotes.length === 0) {
+          DOM.notesList.innerHTML = `<div class="empty-state">Chưa có ghi chú nào.<br>Mở bảng ghi chú (N) để viết thêm.</div>`;
+          return;
+        }
+
+        let html = '';
+        pagesWithNotes.forEach((page) => {
+          html += `
+            <div class="note-item" onclick="window.appGoToPage(${page})">
+              <div style="font-size:12px;font-weight:600;color:var(--accent);margin-bottom:4px;">Trang ${page}</div>
+              <div style="font-size:12px;color:var(--text-secondary);white-space:pre-wrap;">${escapeHtml(state.notes[page])}</div>
+            </div>
+          `;
+        });
+        DOM.notesList.innerHTML = html;
+      }
+
+      function escapeHtml(str) {
+        return str.replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+      }
+
+      function toggleBookmark() {
+        if (state.bookmarks.has(state.currentPage)) {
+          state.bookmarks.delete(state.currentPage);
+          showToast(`Đã bỏ đánh dấu Trang ${state.currentPage}`);
+        } else {
+          state.bookmarks.add(state.currentPage);
+          showToast(`★ Đã đánh dấu Trang ${state.currentPage}`);
+        }
+        try { localStorage.setItem(CONFIG.STORAGE_KEYS.BOOKMARKS, JSON.stringify(Array.from(state.bookmarks))); } catch (e) {}
+        DOM.btnBookmark.classList.toggle('active', state.bookmarks.has(state.currentPage));
+        updateSidebarBadges();
+      }
+
+      function updateNoteDrawer() {
+        DOM.notePageNumber.textContent = state.currentPage;
+        DOM.pageNoteInput.value = state.notes[state.currentPage] || '';
+      }
+
+      // ==========================================================================
+      // 9. LẮNG NGHE SỰ KIỆN & CÔNG CỤ VẼ
+      // ==========================================================================
+      function setupDrawingToolbarEvents() {
+        // Chọn công cụ: Pen / Highlighter / Eraser
+        DOM.toolPen.addEventListener('click', () => {
+          state.activeTool = 'pen';
+          DOM.toolPen.classList.add('active');
+          DOM.toolHighlighter.classList.remove('active');
+          DOM.toolEraser.classList.remove('active');
+        });
+
+        DOM.toolHighlighter.addEventListener('click', () => {
+          state.activeTool = 'highlighter';
+          DOM.toolHighlighter.classList.add('active');
+          DOM.toolPen.classList.remove('active');
+          DOM.toolEraser.classList.remove('active');
+        });
+
+        DOM.toolEraser.addEventListener('click', () => {
+          state.activeTool = 'eraser';
+          DOM.toolEraser.classList.add('active');
+          DOM.toolPen.classList.remove('active');
+          DOM.toolHighlighter.classList.remove('active');
+        });
+
+        // Bảng màu
+        document.querySelectorAll('.color-dot').forEach((dot) => {
+          dot.addEventListener('click', () => {
+            document.querySelectorAll('.color-dot').forEach((d) => d.classList.remove('active'));
+            dot.classList.add('active');
+            state.currentColor = dot.dataset.color;
+            if (state.activeTool === 'eraser') {
+              DOM.toolPen.click();
+            }
+          });
+        });
+
+        // Kích thước nét vẽ
+        DOM.brushSize.addEventListener('input', (e) => {
+          state.brushSize = parseInt(e.target.value, 10);
+        });
+
+        // Undo & Redo & Clear
+        DOM.btnUndo.addEventListener('click', undo);
+        DOM.btnRedo.addEventListener('click', redo);
+        DOM.btnClearCanvas.addEventListener('click', clearCurrentCanvas);
+
+        // Toggle Draw Mode
+        DOM.btnToggleDrawMode.addEventListener('click', toggleDrawMode);
+      }
+
+      function setupGeneralEvents() {
+        DOM.btnPrevPage.addEventListener('click', prevPage);
+        DOM.btnNextPage.addEventListener('click', nextPage);
+        DOM.floatPrev.addEventListener('click', prevPage);
+        DOM.floatNext.addEventListener('click', nextPage);
+
+        DOM.pageInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            goToPage(DOM.pageInput.value);
+            DOM.pageInput.blur();
+          }
+        });
+
+        DOM.btnZoomIn.addEventListener('click', zoomIn);
+        DOM.btnZoomOut.addEventListener('click', zoomOut);
+        DOM.btnZoomReset.addEventListener('click', resetZoom);
+        DOM.btnRotate.addEventListener('click', rotatePage);
+        DOM.btnColorFilter.addEventListener('click', cycleColorFilter);
+
+        DOM.btnToggleSidebar.addEventListener('click', () => {
+          DOM.sidebar.classList.toggle('collapsed');
+        });
+
+        DOM.btnBookmark.addEventListener('click', toggleBookmark);
+
+        DOM.btnToggleNoteDrawer.addEventListener('click', () => {
+          DOM.notePanelDrawer.classList.toggle('collapsed');
+          if (!DOM.notePanelDrawer.classList.contains('collapsed')) {
+            updateNoteDrawer();
+            DOM.pageNoteInput.focus();
+          }
+        });
+
+        DOM.btnCloseNoteDrawer.addEventListener('click', () => DOM.notePanelDrawer.classList.add('collapsed'));
+
+        DOM.pageNoteInput.addEventListener('input', () => {
+          const val = DOM.pageNoteInput.value;
+          if (val.trim()) state.notes[state.currentPage] = val;
+          else delete state.notes[state.currentPage];
+          try { localStorage.setItem(CONFIG.STORAGE_KEYS.NOTES, JSON.stringify(state.notes)); } catch (e) {}
+          updateSidebarBadges();
+        });
+
+        DOM.btnClearNote.addEventListener('click', () => {
+          DOM.pageNoteInput.value = '';
+          delete state.notes[state.currentPage];
+          try { localStorage.setItem(CONFIG.STORAGE_KEYS.NOTES, JSON.stringify(state.notes)); } catch (e) {}
+          updateSidebarBadges();
+        });
+
+        DOM.btnFullscreen.addEventListener('click', () => {
+          if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+          else if (document.exitFullscreen) document.exitFullscreen();
+        });
+
+        DOM.btnHelp.addEventListener('click', () => DOM.helpModal.classList.add('show'));
+        DOM.btnCloseHelpModal.addEventListener('click', () => DOM.helpModal.classList.remove('show'));
+
+        // Tabs
+        document.querySelectorAll('.tab-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach((c) => c.classList.remove('active'));
+            btn.classList.add('active');
+            const targetId = btn.dataset.tab;
+            const targetContent = document.getElementById(targetId);
+            if (targetContent) targetContent.classList.add('active');
+          });
+        });
+
+        // Phím tắt bàn phím
+        window.addEventListener('keydown', (e) => {
+          const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+          if (tag === 'input' || tag === 'textarea') return;
+
+          if (e.ctrlKey || e.metaKey) {
+            if (e.key === 'z' || e.key === 'Z') { e.preventDefault(); undo(); return; }
+            if (e.key === 'y' || e.key === 'Y') { e.preventDefault(); redo(); return; }
+          }
+
+          switch (e.key) {
+            case 'ArrowLeft': case 'a': case 'A': e.preventDefault(); prevPage(); break;
+            case 'ArrowRight': case 'd': case 'D': e.preventDefault(); nextPage(); break;
+            case 'p': case 'P': e.preventDefault(); toggleDrawMode(); break;
+            case '1': DOM.toolPen.click(); break;
+            case '2': DOM.toolHighlighter.click(); break;
+            case '3': DOM.toolEraser.click(); break;
+            case '+': case '=': e.preventDefault(); zoomIn(); break;
+            case '-': case '_': e.preventDefault(); zoomOut(); break;
+            case '0': e.preventDefault(); resetZoom(); break;
+            case 'r': case 'R': e.preventDefault(); rotatePage(); break;
+            case 'b': case 'B': e.preventDefault(); toggleBookmark(); break;
+            case 'm': case 'M': e.preventDefault(); DOM.sidebar.classList.toggle('collapsed'); break;
+            case 'f': case 'F': e.preventDefault(); DOM.btnFullscreen.click(); break;
+            case 'Escape':
+              DOM.helpModal.classList.remove('show');
+              DOM.notePanelDrawer.classList.add('collapsed');
+              break;
+          }
+        });
+
+        window.addEventListener('resize', () => {
+          resizeCanvasToMatchImage();
+        });
+
+        window.appGoToPage = goToPage;
+        window.appRemoveBookmark = (p) => {
+          state.bookmarks.delete(p);
+          try { localStorage.setItem(CONFIG.STORAGE_KEYS.BOOKMARKS, JSON.stringify(Array.from(state.bookmarks))); } catch (e) {}
+          updateSidebarBadges();
+        };
+      }
+
+      let toastTimer = null;
+      function showToast(msg) {
+        DOM.toast.textContent = msg;
+        DOM.toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => DOM.toast.classList.remove('show'), 2200);
+      }
+
+      // ==========================================================================
+      // 10. KHỞI CHẠY HỆ THỐNG
+      // ==========================================================================
+      async function init() {
+        // 1. Tải dữ liệu lưu trữ
+        try {
+          const b = localStorage.getItem(CONFIG.STORAGE_KEYS.BOOKMARKS);
+          if (b) state.bookmarks = new Set(JSON.parse(b));
+          const n = localStorage.getItem(CONFIG.STORAGE_KEYS.NOTES);
+          if (n) state.notes = JSON.parse(n);
+          const p = localStorage.getItem(CONFIG.STORAGE_KEYS.LAST_PAGE);
+          if (p) state.currentPage = parseInt(p, 10) || 1;
+        } catch (e) {}
+
+        // 2. Khởi tạo IndexedDB
+        await initIndexedDB();
+
+        // 3. Xây dựng giao diện
+        buildThumbnails();
+        updateSidebarBadges();
+        setupPointerDrawingEvents();
+        setupDrawingToolbarEvents();
+        setupGeneralEvents();
+
+        // 4. Mở trang hiện tại
+        goToPage(state.currentPage);
+
+        // 5. Đăng ký Service Worker cho PWA Offline (khi chạy trên GitHub Pages hoặc Server)
+        if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+          navigator.serviceWorker.register('./sw.js').catch(() => {});
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+</body>
+</html>

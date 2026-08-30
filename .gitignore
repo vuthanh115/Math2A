@@ -1,0 +1,8 @@
+# Hệ điều hành & IDE rác
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.tmp
+*.log
