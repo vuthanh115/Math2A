@@ -1165,7 +1165,8 @@
         currentColor: '#111827',
         brushSize: 3,
         isDrawing: false,
-        lastPoints: [],
+        lastPoint: null,
+        lastMidPoint: null,
         undoStack: [],
         redoStack: [],
         maxHistory: 25
@@ -1388,17 +1389,18 @@
         const container = DOM.viewerContainer;
 
         function handlePointerDown(e) {
-          // 1. APPLE PENCIL (BÚT VẼ)
+          // 1. APPLE PENCIL (BÚT VẼ) HOẶC CHUỘT
           if (e.pointerType === 'pen' || (e.pointerType === 'mouse' && state.isDrawingMode && e.button === 0)) {
             if (!state.isDrawingMode) return;
             e.preventDefault();
-            canvas.setPointerCapture(e.pointerId);
+            try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
 
             state.isDrawing = true;
             saveHistoryState();
 
             const point = getCanvasCoordinates(e);
-            state.lastPoints = [point];
+            state.lastPoint = point;
+            state.lastMidPoint = point;
 
             applyBrushStyle(point.pressure);
             ctx.beginPath();
@@ -1428,27 +1430,34 @@
         }
 
         function handlePointerMove(e) {
-          // 1. XỬ LÝ VẼ NÉT BÚT
+          // 1. XỬ LÝ VẼ NÉT BÚT LIỀN MẠCH (100% CONTINUOUS & SMOOTH INK)
           if (state.isDrawing && (e.pointerType === 'pen' || e.pointerType === 'mouse')) {
             e.preventDefault();
-            const currentPoint = getCanvasCoordinates(e);
-            state.lastPoints.push(currentPoint);
+            const events = (typeof e.getCoalescedEvents === 'function') ? e.getCoalescedEvents() : [e];
 
-            if (state.lastPoints.length > 2) {
-              const p1 = state.lastPoints[state.lastPoints.length - 2];
-              const p2 = currentPoint;
+            for (const ev of events) {
+              const currentPoint = getCanvasCoordinates(ev);
+              if (!state.lastPoint || !state.lastMidPoint) {
+                state.lastPoint = currentPoint;
+                state.lastMidPoint = currentPoint;
+                continue;
+              }
+
               const midPoint = {
-                x: (p1.x + p2.x) / 2,
-                y: (p1.y + p2.y) / 2,
-                pressure: (p1.pressure + p2.pressure) / 2
+                x: (state.lastPoint.x + currentPoint.x) / 2,
+                y: (state.lastPoint.y + currentPoint.y) / 2,
+                pressure: (state.lastPoint.pressure + currentPoint.pressure) / 2
               };
 
               applyBrushStyle(midPoint.pressure);
 
               ctx.beginPath();
-              ctx.moveTo(p1.x, p1.y);
-              ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+              ctx.moveTo(state.lastMidPoint.x, state.lastMidPoint.y);
+              ctx.quadraticCurveTo(state.lastPoint.x, state.lastPoint.y, midPoint.x, midPoint.y);
               ctx.stroke();
+
+              state.lastPoint = currentPoint;
+              state.lastMidPoint = midPoint;
             }
             return;
           }
@@ -1486,8 +1495,18 @@
 
         function handlePointerUp(e) {
           if (state.isDrawing && (e.pointerType === 'pen' || e.pointerType === 'mouse')) {
+            if (state.lastPoint && state.lastMidPoint) {
+              const endPoint = getCanvasCoordinates(e);
+              applyBrushStyle(endPoint.pressure);
+              ctx.beginPath();
+              ctx.moveTo(state.lastMidPoint.x, state.lastMidPoint.y);
+              ctx.lineTo(endPoint.x, endPoint.y);
+              ctx.stroke();
+            }
             state.isDrawing = false;
-            state.lastPoints = [];
+            state.lastPoint = null;
+            state.lastMidPoint = null;
+
             if (e.pointerId) {
               try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
             }
