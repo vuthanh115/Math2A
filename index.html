@@ -414,11 +414,14 @@
       height: 100%;
       background-color: var(--bg-canvas);
       position: relative;
-      overflow: auto;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
+      touch-action: none !important;
       -webkit-overflow-scrolling: touch;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .viewer-container.mode-pan {
@@ -436,11 +439,12 @@
       align-items: center;
       justify-content: center;
       transform-origin: center center;
-      transition: transform 0.05s ease-out;
+      transition: transform 0.04s ease-out;
       box-shadow: var(--shadow-lg);
       border-radius: 6px;
       overflow: visible;
       background: #fff;
+      will-change: transform;
     }
 
     .main-book-img {
@@ -1145,6 +1149,8 @@
       const state = {
         currentPage: 1,
         zoom: 1.0,
+        panX: 0,
+        panY: 0,
         rotation: 0,
         viewMode: 'single', // 'single' | 'continuous'
         colorFilterIndex: 0,
@@ -1366,78 +1372,169 @@
         };
       }
 
+      // --- BỘ NHẬN DIỆN CỬ CHỈ ĐA ĐIỂM (MULTI-TOUCH & GESTURE ENGINE CHO IPAD) ---
+      const gesture = {
+        touches: new Map(),
+        isPanning: false,
+        lastPan: { x: 0, y: 0 },
+        initialPinchDist: 0,
+        initialZoom: 1.0,
+        initialPan: { x: 0, y: 0 },
+        initialCenter: { x: 0, y: 0 }
+      };
+
       function setupPointerDrawingEvents() {
         const canvas = DOM.drawCanvas;
+        const container = DOM.viewerContainer;
 
-        canvas.addEventListener('pointerdown', (e) => {
-          if (!state.isDrawingMode) return;
+        function handlePointerDown(e) {
+          // 1. APPLE PENCIL (BÚT VẼ)
+          if (e.pointerType === 'pen' || (e.pointerType === 'mouse' && state.isDrawingMode && e.button === 0)) {
+            if (!state.isDrawingMode) return;
+            e.preventDefault();
+            canvas.setPointerCapture(e.pointerId);
 
-          // PALM REJECTION: Nếu là cảm ứng ngón tay (touch), bỏ qua không vẽ
-          // Chỉ nhận diện Apple Pencil (pen) hoặc Chuột máy tính (mouse)
-          if (e.pointerType === 'touch') {
+            state.isDrawing = true;
+            saveHistoryState();
+
+            const point = getCanvasCoordinates(e);
+            state.lastPoints = [point];
+
+            applyBrushStyle(point.pressure);
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, getDynamicLineWidth(point.pressure) / 2, 0, Math.PI * 2);
+            ctx.fill();
             return;
           }
 
-          e.preventDefault();
-          canvas.setPointerCapture(e.pointerId);
+          // 2. CẢM ỨNG NGÓN TAY (TOUCH / PALM) - PAN & PINCH TO ZOOM
+          if (e.pointerType === 'touch' || (e.pointerType === 'mouse' && !state.isDrawingMode && e.button === 0)) {
+            e.preventDefault();
+            gesture.touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
-          state.isDrawing = true;
-          saveHistoryState(); // Lưu undo snapshot trước khi vẽ nét mới
-
-          const point = getCanvasCoordinates(e);
-          state.lastPoints = [point];
-
-          // Bắt đầu cấu hình nét vẽ
-          applyBrushStyle(point.pressure);
-          ctx.beginPath();
-          ctx.arc(point.x, point.y, getDynamicLineWidth(point.pressure) / 2, 0, Math.PI * 2);
-          ctx.fill();
-        });
-
-        canvas.addEventListener('pointermove', (e) => {
-          if (!state.isDrawing || !state.isDrawingMode) return;
-          if (e.pointerType === 'touch') return; // Chặn ngón tay vô tình di chuyển
-
-          e.preventDefault();
-          const currentPoint = getCanvasCoordinates(e);
-          state.lastPoints.push(currentPoint);
-
-          if (state.lastPoints.length > 2) {
-            const p1 = state.lastPoints[state.lastPoints.length - 2];
-            const p2 = currentPoint;
-            const midPoint = {
-              x: (p1.x + p2.x) / 2,
-              y: (p1.y + p2.y) / 2,
-              pressure: (p1.pressure + p2.pressure) / 2
-            };
-
-            applyBrushStyle(midPoint.pressure);
-
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            // Thuật toán đường cong mượt Quadratic Bezier Curve
-            ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
-            ctx.stroke();
+            if (gesture.touches.size === 1) {
+              gesture.lastPan = { x: e.clientX, y: e.clientY };
+              gesture.isPanning = true;
+            } else if (gesture.touches.size === 2) {
+              state.isDrawing = false;
+              gesture.isPanning = true;
+              const pts = Array.from(gesture.touches.values());
+              gesture.initialPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+              gesture.initialZoom = state.zoom;
+              gesture.initialPan = { x: state.panX, y: state.panY };
+              gesture.initialCenter = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
+            }
           }
-        });
+        }
 
-        const stopDrawing = (e) => {
-          if (!state.isDrawing) return;
-          state.isDrawing = false;
-          state.lastPoints = [];
+        function handlePointerMove(e) {
+          // 1. XỬ LÝ VẼ NÉT BÚT
+          if (state.isDrawing && (e.pointerType === 'pen' || e.pointerType === 'mouse')) {
+            e.preventDefault();
+            const currentPoint = getCanvasCoordinates(e);
+            state.lastPoints.push(currentPoint);
 
-          if (e && e.pointerId) {
-            try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+            if (state.lastPoints.length > 2) {
+              const p1 = state.lastPoints[state.lastPoints.length - 2];
+              const p2 = currentPoint;
+              const midPoint = {
+                x: (p1.x + p2.x) / 2,
+                y: (p1.y + p2.y) / 2,
+                pressure: (p1.pressure + p2.pressure) / 2
+              };
+
+              applyBrushStyle(midPoint.pressure);
+
+              ctx.beginPath();
+              ctx.moveTo(p1.x, p1.y);
+              ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+              ctx.stroke();
+            }
+            return;
           }
 
-          // Tự động lưu nét vẽ vào IndexedDB
-          saveCurrentPageCanvas();
-          updateUndoRedoButtons();
-        };
+          // 2. XỬ LÝ ZOOM & PAN BẰNG NGÓN TAY
+          if (gesture.touches.has(e.pointerId)) {
+            e.preventDefault();
+            gesture.touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
-        canvas.addEventListener('pointerup', stopDrawing);
-        canvas.addEventListener('pointercancel', stopDrawing);
-        canvas.addEventListener('pointerleave', stopDrawing);
+            if (gesture.touches.size === 2) {
+              // 2 ngón tay: Pinch Zoom + Pan
+              const pts = Array.from(gesture.touches.values());
+              const currentDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+              if (gesture.initialPinchDist > 0) {
+                const ratio = currentDist / gesture.initialPinchDist;
+                state.zoom = Math.min(CONFIG.MAX_ZOOM, Math.max(CONFIG.MIN_ZOOM, gesture.initialZoom * ratio));
+              }
+              const currentCenter = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
+              state.panX = gesture.initialPan.x + (currentCenter.x - gesture.initialCenter.x);
+              state.panY = gesture.initialPan.y + (currentCenter.y - gesture.initialCenter.y);
+              applyTransformations();
+            } else if (gesture.touches.size === 1 && gesture.isPanning) {
+              // 1 ngón tay: Pan khi đang phóng to hoặc khi tắt chế độ vẽ
+              if (!state.isDrawingMode || state.zoom > 1.05 || e.target !== canvas) {
+                const dx = e.clientX - gesture.lastPan.x;
+                const dy = e.clientY - gesture.lastPan.y;
+                gesture.lastPan = { x: e.clientX, y: e.clientY };
+                state.panX += dx;
+                state.panY += dy;
+                applyTransformations();
+              }
+            }
+          }
+        }
+
+        function handlePointerUp(e) {
+          if (state.isDrawing && (e.pointerType === 'pen' || e.pointerType === 'mouse')) {
+            state.isDrawing = false;
+            state.lastPoints = [];
+            if (e.pointerId) {
+              try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+            }
+            saveCurrentPageCanvas();
+            updateUndoRedoButtons();
+          }
+
+          if (gesture.touches.has(e.pointerId)) {
+            gesture.touches.delete(e.pointerId);
+            if (gesture.touches.size === 0) {
+              gesture.isPanning = false;
+            } else if (gesture.touches.size === 1) {
+              const remaining = Array.from(gesture.touches.values())[0];
+              gesture.lastPan = { x: remaining.x, y: remaining.y };
+            }
+          }
+        }
+
+        canvas.addEventListener('pointerdown', handlePointerDown);
+        canvas.addEventListener('pointermove', handlePointerMove);
+        canvas.addEventListener('pointerup', handlePointerUp);
+        canvas.addEventListener('pointercancel', handlePointerUp);
+        canvas.addEventListener('pointerleave', handlePointerUp);
+
+        container.addEventListener('pointerdown', (e) => {
+          if (e.target !== canvas) handlePointerDown(e);
+        });
+        container.addEventListener('pointermove', (e) => {
+          if (e.target !== canvas) handlePointerMove(e);
+        });
+        container.addEventListener('pointerup', handlePointerUp);
+        container.addEventListener('pointercancel', handlePointerUp);
+
+        // Hỗ trợ cử chỉ Native Gesture Pinch của Safari iPad
+        let safariPinchStartZoom = 1.0;
+        container.addEventListener('gesturestart', (e) => {
+          e.preventDefault();
+          safariPinchStartZoom = state.zoom;
+        });
+        container.addEventListener('gesturechange', (e) => {
+          e.preventDefault();
+          state.zoom = Math.min(CONFIG.MAX_ZOOM, Math.max(CONFIG.MIN_ZOOM, safariPinchStartZoom * e.scale));
+          applyTransformations();
+        });
+        container.addEventListener('gestureend', (e) => {
+          e.preventDefault();
+        });
       }
 
       function getDynamicLineWidth(pressure) {
@@ -1570,6 +1667,8 @@
         saveCurrentPageCanvas();
 
         state.currentPage = target;
+        state.panX = 0;
+        state.panY = 0;
         DOM.pageInput.value = target;
         try { localStorage.setItem(CONFIG.STORAGE_KEYS.LAST_PAGE, target); } catch (e) {}
 
@@ -1609,25 +1708,31 @@
       // ==========================================================================
       function applyTransformations() {
         DOM.zoomLabel.textContent = `${Math.round(state.zoom * 100)}%`;
-        DOM.bookStage.style.transform = `scale(${state.zoom}) rotate(${state.rotation}deg)`;
+        DOM.bookStage.style.transform = `translate3d(${state.panX}px, ${state.panY}px, 0) scale(${state.zoom}) rotate(${state.rotation}deg)`;
       }
 
       function zoomIn() {
         if (state.zoom < CONFIG.MAX_ZOOM) {
-          state.zoom = Math.min(CONFIG.MAX_ZOOM, state.zoom + CONFIG.ZOOM_STEP);
+          state.zoom = Math.min(CONFIG.MAX_ZOOM, Number((state.zoom + CONFIG.ZOOM_STEP).toFixed(2)));
           applyTransformations();
         }
       }
 
       function zoomOut() {
         if (state.zoom > CONFIG.MIN_ZOOM) {
-          state.zoom = Math.max(CONFIG.MIN_ZOOM, state.zoom - CONFIG.ZOOM_STEP);
+          state.zoom = Math.max(CONFIG.MIN_ZOOM, Number((state.zoom - CONFIG.ZOOM_STEP).toFixed(2)));
+          if (state.zoom <= 1.0) {
+            state.panX = 0;
+            state.panY = 0;
+          }
           applyTransformations();
         }
       }
 
       function resetZoom() {
         state.zoom = 1.0;
+        state.panX = 0;
+        state.panY = 0;
         state.rotation = 0;
         applyTransformations();
         showToast('Kích thước chuẩn (100%)');
