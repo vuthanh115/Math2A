@@ -1,13 +1,11 @@
-const CACHE_NAME = 'math2a-v1';
+const CACHE_NAME = 'math2a-v2';
 
-// Danh sách các tài nguyên tĩnh cơ bản
 const STATIC_ASSETS = [
   './',
   './index.html',
   './manifest.json'
 ];
 
-// Cài đặt Service Worker và lưu cache tĩnh
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -17,7 +15,6 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Kích hoạt và dọn dẹp cache cũ
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -29,19 +26,33 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Bắt các yêu cầu mạng và lưu cache runtime (Cache First)
 self.addEventListener('fetch', (event) => {
+  // Với index.html: Network First để luôn cập nhật bản mới nhất khi có mạng, nếu mất mạng thì đọc cache
+  if (
+    event.request.mode === 'navigate' ||
+    event.request.url.endsWith('index.html') ||
+    event.request.url.endsWith('/')
+  ) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          const resClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Với hình ảnh và tài nguyên khác: Cache First để mở siêu nhanh và hỗ trợ Offline
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
         return cachedResponse;
       }
       return fetch(event.request).then((networkResponse) => {
-        if (
-          !networkResponse ||
-          networkResponse.status !== 200 ||
-          networkResponse.type !== 'basic'
-        ) {
+        if (!networkResponse || networkResponse.status !== 200) {
           return networkResponse;
         }
         const responseToCache = networkResponse.clone();

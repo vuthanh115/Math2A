@@ -1108,7 +1108,8 @@
         <tr><td>Lùi / Tiến trang</td><td><kbd>←</kbd> / <kbd>→</kbd> hoặc chạm mũi tên mép màn hình</td></tr>
         <tr><td>Toàn màn hình</td><td><kbd>F</kbd></td></tr>
       </table>
-      <div style="text-align: right;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+        <button id="btnClearAllPages" class="btn" style="background:#ef4444;color:#fff;font-size:12px;padding:0 12px;" title="Xóa sạch nét vẽ trên tất cả 112 trang">Xóa toàn bộ nét vẽ các trang</button>
         <button id="btnCloseHelpModal" class="btn" style="background:var(--accent);color:#000;font-weight:600;padding:0 16px;">Đã hiểu</button>
       </div>
     </div>
@@ -1169,7 +1170,9 @@
         lastMidPoint: null,
         undoStack: [],
         redoStack: [],
-        maxHistory: 25
+        maxHistory: 25,
+        pageLoadSeq: 0,
+        canvasCache: new Map() // Lưu cache tức thời từng trang trong RAM
       };
 
       // --- DOM ELEMENTS ---
@@ -1206,6 +1209,7 @@
         btnUndo: document.getElementById('btnUndo'),
         btnRedo: document.getElementById('btnRedo'),
         btnClearCanvas: document.getElementById('btnClearCanvas'),
+        btnClearAllPages: document.getElementById('btnClearAllPages'),
         // Sidebar
         sidebar: document.getElementById('sidebar'),
         thumbnailsContainer: document.getElementById('thumbnailsContainer'),
@@ -1285,10 +1289,16 @@
         if (!dbInstance) return;
         const tx = dbInstance.transaction(CONFIG.STORE_CANVAS, 'readonly');
         const store = tx.objectStore(CONFIG.STORE_CANVAS);
-        const req = store.getAllKeys();
+        const req = store.getAll();
         req.onsuccess = () => {
           if (req.result) {
-            state.pagesWithInk = new Set(req.result);
+            state.pagesWithInk = new Set();
+            req.result.forEach((item) => {
+              if (item.data) {
+                state.pagesWithInk.add(item.page);
+                state.canvasCache.set(item.page, item.data);
+              }
+            });
             updateSidebarBadges();
           }
         };
@@ -1338,16 +1348,10 @@
 
         if (width === 0 || height === 0) return;
 
-        // Lưu nét vẽ tạm trước khi đổi kích thước
-        const currentData = isCanvasBlank() ? null : DOM.drawCanvas.toDataURL();
-
-        DOM.drawCanvas.width = width;
-        DOM.drawCanvas.height = height;
-
-        if (currentData) {
-          const tempImg = new Image();
-          tempImg.onload = () => ctx.drawImage(tempImg, 0, 0);
-          tempImg.src = currentData;
+        // Đồng bộ kích thước canvas khớp với ảnh thật mà KHÔNG copy nét vẽ cũ
+        if (DOM.drawCanvas.width !== width || DOM.drawCanvas.height !== height) {
+          DOM.drawCanvas.width = width;
+          DOM.drawCanvas.height = height;
         }
       }
 
@@ -1647,33 +1651,79 @@
       function clearCurrentCanvas() {
         saveHistoryState();
         ctx.clearRect(0, 0, DOM.drawCanvas.width, DOM.drawCanvas.height);
-        saveCurrentPageCanvas();
+        state.canvasCache.delete(state.currentPage);
+        saveCanvasToDB(state.currentPage, null);
         showToast(`Đã xóa sạch nét vẽ Trang ${state.currentPage}`);
       }
 
-      function saveCurrentPageCanvas() {
+      function savePageCanvas(pageNumber) {
+        if (!pageNumber) pageNumber = state.currentPage;
+        if (!DOM.drawCanvas.width || !DOM.drawCanvas.height) return;
         if (isCanvasBlank()) {
-          saveCanvasToDB(state.currentPage, null);
+          state.canvasCache.delete(pageNumber);
+          saveCanvasToDB(pageNumber, null);
         } else {
           const dataUrl = DOM.drawCanvas.toDataURL('image/png');
-          saveCanvasToDB(state.currentPage, dataUrl);
+          state.canvasCache.set(pageNumber, dataUrl);
+          saveCanvasToDB(pageNumber, dataUrl);
         }
       }
 
+      function saveCurrentPageCanvas() {
+        savePageCanvas(state.currentPage);
+      }
+
       async function restorePageCanvas(pageNumber) {
+        const currentSeq = state.pageLoadSeq;
         ctx.clearRect(0, 0, DOM.drawCanvas.width, DOM.drawCanvas.height);
         state.undoStack = [];
         state.redoStack = [];
         updateUndoRedoButtons();
 
-        const dataUrl = await loadCanvasFromDB(pageNumber);
+        // 1. Kiểm tra cache RAM
+        let dataUrl = state.canvasCache.get(pageNumber);
+        if (dataUrl === undefined) {
+          dataUrl = await loadCanvasFromDB(pageNumber);
+          if (dataUrl) {
+            state.canvasCache.set(pageNumber, dataUrl);
+          }
+        }
+
+        // Kiểm tra nếu người dùng đã chuyển tiếp sang trang khác trong lúc đọc DB
+        if (currentSeq !== state.pageLoadSeq || state.currentPage !== pageNumber) {
+          return;
+        }
+
         if (dataUrl) {
           const img = new Image();
           img.onload = () => {
+            if (currentSeq !== state.pageLoadSeq || state.currentPage !== pageNumber) return;
+            ctx.clearRect(0, 0, DOM.drawCanvas.width, DOM.drawCanvas.height);
             ctx.drawImage(img, 0, 0);
           };
           img.src = dataUrl;
         }
+      }
+
+      function clearAllPagesCanvas() {
+        if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ nét vẽ trên TẤT CẢ 112 trang không? Thao tác này sẽ đặt lại dữ liệu nét vẽ sạch hoàn toàn.')) {
+          return;
+        }
+        if (dbInstance) {
+          try {
+            const tx = dbInstance.transaction(CONFIG.STORE_CANVAS, 'readwrite');
+            const store = tx.objectStore(CONFIG.STORE_CANVAS);
+            store.clear();
+          } catch (e) {}
+        }
+        state.canvasCache.clear();
+        state.pagesWithInk.clear();
+        ctx.clearRect(0, 0, DOM.drawCanvas.width, DOM.drawCanvas.height);
+        state.undoStack = [];
+        state.redoStack = [];
+        updateUndoRedoButtons();
+        updateSidebarBadges();
+        showToast('Đã xóa sạch nét vẽ trên tất cả 112 trang!');
       }
 
       // ==========================================================================
@@ -1681,23 +1731,38 @@
       // ==========================================================================
       async function goToPage(pageNumber) {
         const target = Math.max(1, Math.min(CONFIG.TOTAL_PAGES, parseInt(pageNumber, 10) || 1));
+        const prevPage = state.currentPage;
 
-        // 1. Tự động lưu trang hiện tại trước khi chuyển
-        saveCurrentPageCanvas();
+        // Nếu là trang đang xem và canvas đã khởi tạo thì không làm lại
+        if (target === prevPage && DOM.drawCanvas.width > 0 && state.pageLoadSeq > 0) return;
 
+        // 1. Lưu trang cũ trước khi chuyển
+        savePageCanvas(prevPage);
+
+        // 2. Chuyển state sang trang mới
         state.currentPage = target;
         state.panX = 0;
         state.panY = 0;
+        state.pageLoadSeq = (state.pageLoadSeq || 0) + 1;
+        const currentSeq = state.pageLoadSeq;
+
         DOM.pageInput.value = target;
         try { localStorage.setItem(CONFIG.STORAGE_KEYS.LAST_PAGE, target); } catch (e) {}
 
-        // 2. Cập nhật nút bookmark & notes
+        // 3. Xóa sạch canvas NGAY LẬP TỨC để không bao giờ thấy nét vẽ của trang trước
+        ctx.clearRect(0, 0, DOM.drawCanvas.width, DOM.drawCanvas.height);
+        state.undoStack = [];
+        state.redoStack = [];
+        updateUndoRedoButtons();
+
+        // 4. Cập nhật nút bookmark & notes
         DOM.btnBookmark.classList.toggle('active', state.bookmarks.has(target));
         DOM.btnBookmark.style.color = state.bookmarks.has(target) ? 'var(--bookmark-color)' : '';
         updateNoteDrawer();
 
-        // 3. Tải ảnh sách
+        // 5. Tải ảnh sách trang mới
         setSmartImageSource(DOM.mainBookImage, target, () => {
+          if (currentSeq !== state.pageLoadSeq) return;
           resizeCanvasToMatchImage();
           restorePageCanvas(target);
           applyTransformations();
@@ -1970,6 +2035,7 @@
         DOM.btnUndo.addEventListener('click', undo);
         DOM.btnRedo.addEventListener('click', redo);
         DOM.btnClearCanvas.addEventListener('click', clearCurrentCanvas);
+        if (DOM.btnClearAllPages) DOM.btnClearAllPages.addEventListener('click', clearAllPagesCanvas);
 
         // Toggle Draw Mode
         DOM.btnToggleDrawMode.addEventListener('click', toggleDrawMode);
