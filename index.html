@@ -1522,6 +1522,196 @@
       font-size: 0.9em;
     }
 
+    /* Times Tables Tab (Bảng cửu chương) */
+    .tt-controls-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tt-selector-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .tt-pill {
+      min-width: 52px;
+      height: 38px;
+      padding: 0 12px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-color);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all var(--transition-fast);
+      touch-action: manipulation;
+    }
+
+    .tt-pill.exam-star {
+      border-color: rgba(245, 158, 11, 0.55);
+      background: rgba(245, 158, 11, 0.12);
+      color: #fde68a;
+    }
+
+    .tt-pill.active {
+      background: var(--accent);
+      color: #04121e;
+      border-color: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .tt-mode-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .tt-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 10px;
+    }
+
+    .tt-row-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      transition: transform var(--transition-fast), border-color var(--transition-fast);
+      touch-action: manipulation;
+    }
+
+    .tt-row-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .tt-equation {
+      font-size: 19px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tt-ans-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 42px;
+      height: 32px;
+      padding: 0 8px;
+      border-radius: 8px;
+      background: rgba(56, 189, 248, 0.18);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .tt-ans-chip.hidden-ans {
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.45);
+    }
+
+    .tt-drill-box {
+      background: var(--bg-secondary);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: var(--radius-lg);
+      padding: 22px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .tt-drill-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .tt-stat-pill {
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .tt-drill-question {
+      font-size: 40px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 1px;
+      margin: 6px 0;
+    }
+
+    .tt-drill-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(120px, 180px));
+      gap: 12px;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .tt-choice-btn {
+      height: 58px;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--bg-tertiary);
+      background: var(--bg-primary);
+      color: #fff;
+      font-size: 22px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      touch-action: manipulation;
+    }
+
+    .tt-choice-btn:active {
+      transform: scale(0.95);
+    }
+
+    .tt-choice-btn.correct {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: var(--success-color);
+      color: #6ee7b7;
+    }
+
+    .tt-choice-btn.wrong {
+      background: rgba(239, 68, 68, 0.25);
+      border-color: var(--danger-color);
+      color: #fca5a5;
+    }
+
     /* Responsive cho iPad dọc & Mobile */
     @media (max-width: 860px) {
       .app-title span.text { display: none; }
@@ -1821,9 +2011,10 @@
         </div>
       </div>
 
-      <!-- 3 Sub-tabs -->
+      <!-- 4 Sub-tabs -->
       <div class="review-subtabs" role="tablist">
         <button id="subtabGuide" class="review-subtab-btn active" data-review-tab="panelGuide">📚 Study Guide & Pages</button>
+        <button id="subtabTimesTables" class="review-subtab-btn" data-review-tab="panelTimesTables">✖️ Times Tables</button>
         <button id="subtabVocab" class="review-subtab-btn" data-review-tab="panelVocab">🔤 Math Vocabulary (19)</button>
         <button id="subtabQuiz" class="review-subtab-btn" data-review-tab="panelQuiz">🎯 Practice Quiz</button>
       </div>
@@ -1834,6 +2025,44 @@
           📌 <strong>Exam Scope Note:</strong> Excludes <em>Try this</em> (p. 41, 43, 45, 47, 51), <em>Assessment</em> (p. 49), pages 53, 59, 61, and Ex 2 on p. 60.
         </div>
         <div id="reviewUnitsContainer" style="display:flex;flex-direction:column;gap:16px;"></div>
+      </div>
+
+      <!-- PANEL 1.5: TIMES TABLES (BẢNG CỬU CHƯƠNG) -->
+      <div id="panelTimesTables" class="review-panel">
+        <div id="ttBanner" class="review-note-banner" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.35);color:#fde68a;">
+          ⭐ <strong>Final Term 1 Focus:</strong> <strong>2×</strong> and <strong>4×</strong> times tables (plus 0× and 1× rules). You can also practice 1× to 10×!
+        </div>
+        <div class="tt-controls-card">
+          <div id="ttSelectorRow" class="tt-selector-row"></div>
+          <div class="tt-mode-bar">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button id="btnTtModeLearn" class="btn active">📖 Learn & Listen</button>
+              <button id="btnTtModeDrill" class="btn">⚡ Quick Practice</button>
+            </div>
+            <div id="ttLearnActions" style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button id="btnTtReadAll" class="btn" style="background:rgba(56,189,248,0.16);color:var(--accent);border-color:rgba(56,189,248,0.35);">🔊 Read Full Table</button>
+              <button id="btnTtHideAnswers" class="btn">🙈 Hide Answers</button>
+            </div>
+            <div id="ttDrillScopeWrap" style="display:none;gap:6px;flex-wrap:wrap;align-items:center;">
+              <button class="btn active" data-tt-scope="term1" style="height:32px;font-size:12px;">⭐ 2× & 4×</button>
+              <button class="btn" data-tt-scope="selected" style="height:32px;font-size:12px;">Current Table</button>
+              <button class="btn" data-tt-scope="all" style="height:32px;font-size:12px;">All 1×–10×</button>
+            </div>
+          </div>
+        </div>
+        <div id="ttLearnContainer" class="tt-grid"></div>
+        <div id="ttDrillContainer" class="tt-drill-box" style="display:none;">
+          <div class="tt-drill-stats">
+            <span class="tt-stat-pill" id="ttDrillScore">⭐ Score: 0 / 0</span>
+            <span class="tt-stat-pill" id="ttDrillStreak">🔥 Streak: 0</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div id="ttDrillQuestion" class="tt-drill-question">2 × 3 = ?</div>
+            <button id="btnTtSpeakQuestion" class="vocab-speak-btn" title="Listen">🔊</button>
+          </div>
+          <div id="ttDrillFeedback" style="font-size:14px;font-weight:700;min-height:22px;color:var(--accent);"></div>
+          <div id="ttDrillOptions" class="tt-drill-options"></div>
+        </div>
       </div>
 
       <!-- PANEL 2: MATH VOCABULARY FLASHCARDS -->
@@ -2313,8 +2542,25 @@
         reviewHeroDesc: document.getElementById('reviewHeroDesc'),
         reviewProgressLabel: document.getElementById('reviewProgressLabel'),
         subtabGuide: document.getElementById('subtabGuide'),
+        subtabTimesTables: document.getElementById('subtabTimesTables'),
         subtabVocab: document.getElementById('subtabVocab'),
         subtabQuiz: document.getElementById('subtabQuiz'),
+        ttBanner: document.getElementById('ttBanner'),
+        ttSelectorRow: document.getElementById('ttSelectorRow'),
+        btnTtModeLearn: document.getElementById('btnTtModeLearn'),
+        btnTtModeDrill: document.getElementById('btnTtModeDrill'),
+        ttLearnActions: document.getElementById('ttLearnActions'),
+        btnTtReadAll: document.getElementById('btnTtReadAll'),
+        btnTtHideAnswers: document.getElementById('btnTtHideAnswers'),
+        ttDrillScopeWrap: document.getElementById('ttDrillScopeWrap'),
+        ttLearnContainer: document.getElementById('ttLearnContainer'),
+        ttDrillContainer: document.getElementById('ttDrillContainer'),
+        ttDrillScore: document.getElementById('ttDrillScore'),
+        ttDrillStreak: document.getElementById('ttDrillStreak'),
+        ttDrillQuestion: document.getElementById('ttDrillQuestion'),
+        btnTtSpeakQuestion: document.getElementById('btnTtSpeakQuestion'),
+        ttDrillFeedback: document.getElementById('ttDrillFeedback'),
+        ttDrillOptions: document.getElementById('ttDrillOptions'),
         reviewScopeBanner: document.getElementById('reviewScopeBanner'),
         reviewVocabBanner: document.getElementById('reviewVocabBanner'),
         sidebarReviewList: document.getElementById('sidebarReviewList'),
@@ -3303,8 +3549,22 @@
           DOM.reviewProgressLabel.textContent = bi ? 'Study Progress / Tiến độ' : 'Study Progress';
         }
         if (DOM.subtabGuide) DOM.subtabGuide.textContent = bi ? '📚 Study Guide / Đề cương' : '📚 Study Guide & Pages';
+        if (DOM.subtabTimesTables) DOM.subtabTimesTables.textContent = bi ? '✖️ Times Tables / Bảng cửu chương' : '✖️ Times Tables';
         if (DOM.subtabVocab) DOM.subtabVocab.textContent = bi ? '🔤 Vocabulary / Từ vựng (19)' : '🔤 Math Vocabulary (19)';
         if (DOM.subtabQuiz) DOM.subtabQuiz.textContent = bi ? '🎯 Practice Quiz / Luyện đề' : '🎯 Practice Quiz';
+        if (DOM.ttBanner) {
+          DOM.ttBanner.innerHTML = bi
+            ? '⭐ <strong>Final Term 1 Focus:</strong> <strong>2×</strong> and <strong>4×</strong> times tables (plus 0× and 1× rules). You can also practice 1× to 10×!<span class="vi-sub">Trọng tâm HK1: Bảng nhân 2 và bảng nhân 4 (kèm quy tắc nhân 0, 1). Bé có thể học thêm từ bảng 1 đến bảng 10!</span>'
+            : '⭐ <strong>Final Term 1 Focus:</strong> <strong>2×</strong> and <strong>4×</strong> times tables (plus 0× and 1× rules). You can also practice 1× to 10×!';
+        }
+        if (DOM.btnTtModeLearn) DOM.btnTtModeLearn.textContent = bi ? '📖 Learn / Học bảng' : '📖 Learn & Listen';
+        if (DOM.btnTtModeDrill) DOM.btnTtModeDrill.textContent = bi ? '⚡ Quick Quiz / Luyện phản xạ' : '⚡ Quick Practice';
+        if (DOM.btnTtReadAll) DOM.btnTtReadAll.textContent = bi ? '🔊 Read Table / Đọc cả bảng' : '🔊 Read Full Table';
+        if (DOM.btnTtHideAnswers) {
+          DOM.btnTtHideAnswers.textContent = ttState.hideAnswers
+            ? (bi ? '👁 Show / Hiện đáp án' : '👁 Show Answers')
+            : (bi ? '🙈 Hide / Ẩn để nhẩm' : '🙈 Hide Answers');
+        }
 
         if (DOM.reviewScopeBanner) {
           DOM.reviewScopeBanner.innerHTML = bi
@@ -3334,6 +3594,7 @@
         }
 
         renderReviewUnits();
+        renderTimesTablesUI();
         renderVocabCards();
         renderQuizSections();
         renderSidebarReviewList();
@@ -3512,6 +3773,148 @@
           html += `</div></div>`;
         });
         DOM.reviewUnitsContainer.innerHTML = html;
+      }
+
+      // --- TIMES TABLES (BẢNG CỬU CHƯƠNG) ENGINE ---
+      const ttState = {
+        selectedTable: 2,
+        mode: 'learn', // 'learn' | 'drill'
+        hideAnswers: false,
+        drillScope: 'term1', // 'term1' | 'selected' | 'all'
+        score: 0,
+        total: 0,
+        streak: 0,
+        currentQ: { a: 2, b: 3, ans: 6 },
+        locked: false
+      };
+
+      function renderTimesTablesUI() {
+        if (!DOM.ttSelectorRow || !DOM.ttLearnContainer) return;
+        let pillsHtml = '';
+        for (let n = 1; n <= 10; n++) {
+          const isExam = (n === 2 || n === 4);
+          const isActive = ttState.selectedTable === n;
+          pillsHtml += `<button class="tt-pill ${isExam ? 'exam-star' : ''} ${isActive ? 'active' : ''}" data-tt-num="${n}">${isExam ? '⭐ ' : ''}${n}×</button>`;
+        }
+        DOM.ttSelectorRow.innerHTML = pillsHtml;
+        DOM.ttSelectorRow.querySelectorAll('.tt-pill').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            ttState.selectedTable = parseInt(btn.dataset.ttNum, 10);
+            renderTimesTablesUI();
+            if (ttState.mode === 'drill' && ttState.drillScope === 'selected') {
+              nextTtDrillQuestion();
+            }
+          });
+        });
+
+        const n = ttState.selectedTable;
+        let rowsHtml = '';
+        for (let i = 1; i <= 10; i++) {
+          const prod = n * i;
+          rowsHtml += `
+            <div class="tt-row-card" data-tt-fact="${n}x${i}">
+              <div class="tt-equation">
+                <span>${n} × ${i} =</span>
+                <span class="tt-ans-chip ${ttState.hideAnswers ? 'hidden-ans' : ''}" data-real="${prod}">${ttState.hideAnswers ? '?' : prod}</span>
+              </div>
+              <button class="vocab-speak-btn" data-tt-speak="${n} times ${i} equals ${prod}" title="Listen">🔊</button>
+            </div>
+          `;
+        }
+        DOM.ttLearnContainer.innerHTML = rowsHtml;
+
+        DOM.ttLearnContainer.querySelectorAll('.vocab-speak-btn').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            speakMathText(btn.dataset.ttSpeak);
+          });
+        });
+
+        DOM.ttLearnContainer.querySelectorAll('.tt-row-card').forEach((card) => {
+          card.addEventListener('click', () => {
+            const chip = card.querySelector('.tt-ans-chip');
+            if (chip && chip.classList.contains('hidden-ans')) {
+              chip.classList.remove('hidden-ans');
+              chip.textContent = chip.dataset.real;
+            }
+          });
+        });
+      }
+
+      function setTtMode(mode) {
+        ttState.mode = mode;
+        const isDrill = mode === 'drill';
+        DOM.btnTtModeLearn.classList.toggle('active', !isDrill);
+        DOM.btnTtModeDrill.classList.toggle('active', isDrill);
+        DOM.ttLearnActions.style.display = isDrill ? 'none' : 'flex';
+        DOM.ttDrillScopeWrap.style.display = isDrill ? 'flex' : 'none';
+        DOM.ttLearnContainer.style.display = isDrill ? 'none' : 'grid';
+        DOM.ttDrillContainer.style.display = isDrill ? 'flex' : 'none';
+        if (isDrill) nextTtDrillQuestion();
+      }
+
+      function nextTtDrillQuestion() {
+        ttState.locked = false;
+        let a = ttState.selectedTable;
+        if (ttState.drillScope === 'term1') {
+          a = pickOne([2, 4]);
+        } else if (ttState.drillScope === 'all') {
+          a = randInt(1, 10);
+        }
+        const b = randInt(1, 10);
+        const ans = a * b;
+        ttState.currentQ = { a, b, ans };
+
+        DOM.ttDrillQuestion.textContent = `${a} × ${b} = ?`;
+        DOM.ttDrillFeedback.textContent = '';
+
+        // Generate 3 plausible distinct distractors
+        const opts = new Set([ans]);
+        const deltas = [-a, a, -2, 2, -1, 1, -4, 4, 3, -3, 5, 10];
+        let guard = 0;
+        while (opts.size < 4 && guard < 40) {
+          guard++;
+          const cand = ans + pickOne(deltas);
+          if (cand > 0 && cand !== ans) opts.add(cand);
+        }
+        while (opts.size < 4) opts.add(randInt(1, 40));
+
+        const shuffled = Array.from(opts).sort(() => Math.random() - 0.5);
+        DOM.ttDrillOptions.innerHTML = shuffled
+          .map((val) => `<button class="tt-choice-btn" data-val="${val}">${val}</button>`)
+          .join('');
+
+        DOM.ttDrillOptions.querySelectorAll('.tt-choice-btn').forEach((btn) => {
+          btn.addEventListener('click', () => handleTtDrillChoice(btn));
+        });
+      }
+
+      function handleTtDrillChoice(btn) {
+        if (ttState.locked) return;
+        const chosen = parseInt(btn.dataset.val, 10);
+        const { a, b, ans } = ttState.currentQ;
+        const bi = state.reviewBilingual;
+        ttState.total++;
+
+        if (chosen === ans) {
+          ttState.locked = true;
+          ttState.score++;
+          ttState.streak++;
+          btn.classList.add('correct');
+          DOM.ttDrillQuestion.textContent = `${a} × ${b} = ${ans}`;
+          DOM.ttDrillFeedback.style.color = '#6ee7b7';
+          DOM.ttDrillFeedback.textContent = bi ? '🎉 Correct! (Đúng rồi, giỏi quá!)' : '🎉 Correct! Great job!';
+          setTimeout(nextTtDrillQuestion, 700);
+        } else {
+          ttState.streak = 0;
+          btn.classList.add('wrong');
+          btn.disabled = true;
+          DOM.ttDrillFeedback.style.color = '#fca5a5';
+          DOM.ttDrillFeedback.textContent = bi ? 'Oops! Try again (Thử lại nhé con!)' : 'Oops! Try another answer!';
+        }
+
+        DOM.ttDrillScore.textContent = `⭐ Score: ${ttState.score} / ${ttState.total}`;
+        DOM.ttDrillStreak.textContent = `🔥 Streak: ${ttState.streak}`;
       }
 
       function speakMathText(text) {
@@ -4009,6 +4412,45 @@
         if (DOM.btnGradeQuiz) DOM.btnGradeQuiz.addEventListener('click', gradeReviewQuiz);
         if (DOM.btnShowAnswers) DOM.btnShowAnswers.addEventListener('click', showReviewQuizAnswers);
         if (DOM.btnResetQuiz) DOM.btnResetQuiz.addEventListener('click', resetReviewQuiz);
+
+        // Times Tables events
+        if (DOM.btnTtModeLearn) DOM.btnTtModeLearn.addEventListener('click', () => setTtMode('learn'));
+        if (DOM.btnTtModeDrill) DOM.btnTtModeDrill.addEventListener('click', () => setTtMode('drill'));
+        if (DOM.btnTtReadAll) {
+          DOM.btnTtReadAll.addEventListener('click', () => {
+            const n = ttState.selectedTable;
+            const lines = [];
+            for (let i = 1; i <= 10; i++) lines.push(`${n} times ${i} equals ${n * i}`);
+            speakMathText(lines.join('. '));
+          });
+        }
+        if (DOM.btnTtHideAnswers) {
+          DOM.btnTtHideAnswers.addEventListener('click', () => {
+            ttState.hideAnswers = !ttState.hideAnswers;
+            DOM.btnTtHideAnswers.classList.toggle('active', ttState.hideAnswers);
+            const bi = state.reviewBilingual;
+            DOM.btnTtHideAnswers.textContent = ttState.hideAnswers
+              ? (bi ? '👁 Show / Hiện đáp án' : '👁 Show Answers')
+              : (bi ? '🙈 Hide / Ẩn để nhẩm' : '🙈 Hide Answers');
+            renderTimesTablesUI();
+          });
+        }
+        if (DOM.ttDrillScopeWrap) {
+          DOM.ttDrillScopeWrap.querySelectorAll('[data-tt-scope]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              DOM.ttDrillScopeWrap.querySelectorAll('[data-tt-scope]').forEach((b) => b.classList.remove('active'));
+              btn.classList.add('active');
+              ttState.drillScope = btn.dataset.ttScope;
+              nextTtDrillQuestion();
+            });
+          });
+        }
+        if (DOM.btnTtSpeakQuestion) {
+          DOM.btnTtSpeakQuestion.addEventListener('click', () => {
+            const { a, b } = ttState.currentQ;
+            speakMathText(`What is ${a} times ${b}?`);
+          });
+        }
       }
 
       let toastTimer = null;
