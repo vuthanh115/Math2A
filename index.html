@@ -439,6 +439,22 @@
       cursor: grabbing;
     }
 
+    .viewer-container.mode-continuous {
+      overflow-y: auto;
+      align-items: flex-start;
+      touch-action: pan-y !important;
+    }
+
+    .viewer-container.mode-continuous .book-stage,
+    .viewer-container.mode-continuous .nav-arrow,
+    .viewer-container.mode-continuous .draw-dock {
+      display: none !important;
+    }
+
+    .viewer-container.mode-continuous .continuous-wrapper {
+      display: flex;
+    }
+
     /* Sân khấu sách: Giữ ảnh và canvas đồng bộ 100% */
     .book-stage {
       position: relative;
@@ -1245,6 +1261,36 @@
       color: #fff;
     }
 
+    .vocab-top-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .vocab-speak-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      background: rgba(56, 189, 248, 0.14);
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all var(--transition-fast);
+      touch-action: manipulation;
+    }
+
+    .vocab-speak-btn:active {
+      transform: scale(0.88);
+      background: var(--accent);
+      color: #04121e;
+    }
+
     .vocab-vi {
       font-size: 14px;
       font-weight: 700;
@@ -1719,6 +1765,11 @@
           <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
         </button>
 
+        <!-- Xuất ảnh trang bài làm (PNG) -->
+        <button id="btnExportPagePng" class="dock-btn" title="Tải ảnh bài làm trang này (PNG)">
+          <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        </button>
+
         <!-- Badge chống chạm lòng bàn tay (Palm Rejection) -->
         <div class="palm-status-badge" title="Chỉ nhận bút Apple Pencil khi vẽ, ngón tay để cuộn">
           <svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -1798,6 +1849,7 @@
         <div class="quiz-toolbar">
           <div id="quizScoreBadge" class="quiz-score-badge">Fill in the answers and tap "Check Answers"! 🌟</div>
           <div class="quiz-actions">
+            <button id="btnNewRandomQuiz" class="btn" style="background:rgba(56,189,248,0.18);color:#38bdf8;border-color:rgba(56,189,248,0.4);font-weight:700;">🎲 New Quiz</button>
             <button id="btnGradeQuiz" class="btn" style="background:var(--success-color);color:#042f2e;font-weight:700;">✅ Check Answers</button>
             <button id="btnShowAnswers" class="btn" style="background:rgba(245,158,11,0.2);color:#fbbf24;border-color:rgba(245,158,11,0.4);">👁 Show Answers</button>
             <button id="btnResetQuiz" class="btn">🔄 Reset</button>
@@ -1824,6 +1876,11 @@
         <tr><td>Lùi / Tiến trang</td><td><kbd>←</kbd> / <kbd>→</kbd> hoặc chạm mũi tên mép màn hình</td></tr>
         <tr><td>Toàn màn hình</td><td><kbd>F</kbd></td></tr>
       </table>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border-color);">
+        <button id="btnBackupData" class="btn" style="background:rgba(56,189,248,0.15);color:var(--accent);border-color:rgba(56,189,248,0.35);font-size:12px;padding:0 12px;" title="Tải file sao lưu toàn bộ nét vẽ, ghi chú, đánh dấu & tiến độ ôn tập">💾 Sao lưu dữ liệu (JSON)</button>
+        <button id="btnRestoreData" class="btn" style="background:rgba(16,185,129,0.15);color:var(--success-color);border-color:rgba(16,185,129,0.35);font-size:12px;padding:0 12px;" title="Khôi phục từ file sao lưu JSON">📂 Khôi phục (JSON)</button>
+        <input type="file" id="restoreFileInput" accept=".json,application/json" style="display:none;" />
+      </div>
       <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
         <button id="btnClearAllPages" class="btn" style="background:#ef4444;color:#fff;font-size:12px;padding:0 12px;" title="Xóa sạch nét vẽ trên tất cả 112 trang">Xóa toàn bộ nét vẽ các trang</button>
         <button id="btnCloseHelpModal" class="btn" style="background:var(--accent);color:#000;font-weight:600;padding:0 16px;">Đã hiểu</button>
@@ -1860,7 +1917,9 @@
           VIEW_MODE: 'math2a_view_mode',
           COLOR_FILTER: 'math2a_color_filter',
           REVIEW_DONE: 'math2a_review_done_v1',
-          REVIEW_BILINGUAL: 'math2a_review_bilingual_v1'
+          REVIEW_BILINGUAL: 'math2a_review_bilingual_v1',
+          BRUSH_SIZE: 'math2a_brush_size_v1',
+          BRUSH_COLOR: 'math2a_brush_color_v1'
         }
       };
 
@@ -2219,7 +2278,11 @@
         btnUndo: document.getElementById('btnUndo'),
         btnRedo: document.getElementById('btnRedo'),
         btnClearCanvas: document.getElementById('btnClearCanvas'),
+        btnExportPagePng: document.getElementById('btnExportPagePng'),
         btnClearAllPages: document.getElementById('btnClearAllPages'),
+        btnBackupData: document.getElementById('btnBackupData'),
+        btnRestoreData: document.getElementById('btnRestoreData'),
+        restoreFileInput: document.getElementById('restoreFileInput'),
         // Sidebar
         sidebar: document.getElementById('sidebar'),
         thumbnailsContainer: document.getElementById('thumbnailsContainer'),
@@ -2261,6 +2324,7 @@
         reviewProgressText: document.getElementById('reviewProgressText'),
         reviewProgressFill: document.getElementById('reviewProgressFill'),
         quizScoreBadge: document.getElementById('quizScoreBadge'),
+        btnNewRandomQuiz: document.getElementById('btnNewRandomQuiz'),
         btnGradeQuiz: document.getElementById('btnGradeQuiz'),
         btnShowAnswers: document.getElementById('btnShowAnswers'),
         btnResetQuiz: document.getElementById('btnResetQuiz')
@@ -2344,12 +2408,11 @@
       function getImagePaths(pageIndex) {
         const pad3 = String(pageIndex).padStart(3, '0');
         return [
-          `page_${pad3} .png`,
           `page_${pad3}.png`,
+          `page_${pad3} .png`,
           `page_${pageIndex}.png`,
-          `images/page_${pageIndex}.png`,
           `images/page_${pad3}.png`,
-          `images/page_${pad3} .png`
+          `images/page_${pageIndex}.png`
         ];
       }
 
@@ -2881,6 +2944,177 @@
         showToast(`Chế độ màu: ${state.colorFilterNames[state.colorFilterIndex]}`);
       }
 
+      let continuousBuilt = false;
+      function buildContinuousPages() {
+        if (continuousBuilt) return;
+        continuousBuilt = true;
+        const frag = document.createDocumentFragment();
+        for (let i = 1; i <= CONFIG.TOTAL_PAGES; i++) {
+          const card = document.createElement('div');
+          card.className = 'continuous-page-card';
+          card.id = `contPage_${i}`;
+          card.innerHTML = `
+            <div class="page-label">
+              <span>Trang ${i} / ${CONFIG.TOTAL_PAGES}</span>
+              <button class="btn" style="height:26px;padding:0 10px;font-size:11px;background:rgba(56,189,248,0.16);color:var(--accent);" onclick="window.appOpenSinglePage(${i})">✎ Mở viết trang này</button>
+            </div>
+          `;
+          const img = document.createElement('img');
+          img.className = 'continuous-img';
+          img.loading = 'lazy';
+          img.alt = `Trang ${i}`;
+          setSmartImageSource(img, i);
+          card.appendChild(img);
+          frag.appendChild(card);
+        }
+        DOM.continuousWrapper.appendChild(frag);
+      }
+
+      function toggleViewMode(forceMode) {
+        const nextMode = forceMode || (state.viewMode === 'single' ? 'continuous' : 'single');
+        state.viewMode = nextMode;
+        const isCont = state.viewMode === 'continuous';
+        DOM.viewerContainer.classList.toggle('mode-continuous', isCont);
+        if (DOM.viewModeLabel) DOM.viewModeLabel.textContent = isCont ? 'Cuộn liên tục' : 'Đơn trang';
+        if (DOM.btnToggleViewMode) DOM.btnToggleViewMode.classList.toggle('active', isCont);
+        if (isCont) {
+          buildContinuousPages();
+          setTimeout(() => {
+            const target = document.getElementById(`contPage_${state.currentPage}`);
+            if (target) target.scrollIntoView({ behavior: 'auto', block: 'start' });
+          }, 50);
+          showToast('Chế độ Cuộn liên tục (Chạm nút trên trang để viết)');
+        } else {
+          setTimeout(() => {
+            resizeCanvasToMatchImage();
+            applyTransformations();
+          }, 40);
+          showToast('Chế độ Đơn trang (Viết Apple Pencil)');
+        }
+      }
+
+      function exportCurrentPagePng() {
+        const img = DOM.mainBookImage;
+        if (!img || !img.naturalWidth) {
+          showToast('Trang sách chưa tải xong!');
+          return;
+        }
+        const out = document.createElement('canvas');
+        out.width = img.naturalWidth;
+        out.height = img.naturalHeight;
+        const octx = out.getContext('2d');
+        octx.fillStyle = '#ffffff';
+        octx.fillRect(0, 0, out.width, out.height);
+        octx.drawImage(img, 0, 0, out.width, out.height);
+        if (DOM.drawCanvas.width > 0 && DOM.drawCanvas.height > 0) {
+          octx.drawImage(DOM.drawCanvas, 0, 0, out.width, out.height);
+        }
+        try {
+          const url = out.toDataURL('image/png');
+          const a = document.createElement('a');
+          const pad3 = String(state.currentPage).padStart(3, '0');
+          a.href = url;
+          a.download = `Math2A_Page_${pad3}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          showToast(`Đã tải ảnh bài làm Trang ${state.currentPage} (PNG)!`);
+        } catch (err) {
+          showToast('Không thể xuất ảnh trên trình duyệt này.');
+        }
+      }
+
+      async function backupAllDataJson() {
+        const drawings = {};
+        if (dbInstance) {
+          await new Promise((resolve) => {
+            const tx = dbInstance.transaction(CONFIG.STORE_CANVAS, 'readonly');
+            const req = tx.objectStore(CONFIG.STORE_CANVAS).getAll();
+            req.onsuccess = () => {
+              (req.result || []).forEach((item) => {
+                if (item.data) drawings[item.page] = item.data;
+              });
+              resolve();
+            };
+            req.onerror = () => resolve();
+          });
+        } else {
+          state.canvasCache.forEach((v, k) => { if (v) drawings[k] = v; });
+        }
+
+        const payload = {
+          app: 'Math2A',
+          version: 1,
+          exportedAt: new Date().toISOString(),
+          bookmarks: Array.from(state.bookmarks),
+          notes: state.notes,
+          completedReviewPages: Array.from(state.completedReviewPages),
+          reviewBilingual: state.reviewBilingual,
+          brushSize: state.brushSize,
+          currentColor: state.currentColor,
+          drawings
+        };
+
+        const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const dateStr = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = `Math2A_Backup_${dateStr}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast(`Đã xuất sao lưu (${Object.keys(drawings).length} trang có nét vẽ)!`);
+      }
+
+      function restoreAllDataJson(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async () => {
+          try {
+            const data = JSON.parse(reader.result);
+            if (!data || data.app !== 'Math2A') {
+              showToast('File sao lưu không hợp lệ!');
+              return;
+            }
+            if (Array.isArray(data.bookmarks)) {
+              state.bookmarks = new Set(data.bookmarks);
+              try { localStorage.setItem(CONFIG.STORAGE_KEYS.BOOKMARKS, JSON.stringify(data.bookmarks)); } catch (e) {}
+            }
+            if (data.notes && typeof data.notes === 'object') {
+              state.notes = data.notes;
+              try { localStorage.setItem(CONFIG.STORAGE_KEYS.NOTES, JSON.stringify(data.notes)); } catch (e) {}
+            }
+            if (Array.isArray(data.completedReviewPages)) {
+              state.completedReviewPages = new Set(data.completedReviewPages);
+              saveReviewDone();
+            }
+            if (typeof data.reviewBilingual === 'boolean') {
+              state.reviewBilingual = data.reviewBilingual;
+              try { localStorage.setItem(CONFIG.STORAGE_KEYS.REVIEW_BILINGUAL, state.reviewBilingual ? '1' : '0'); } catch (e) {}
+            }
+            if (data.drawings && typeof data.drawings === 'object') {
+              const entries = Object.entries(data.drawings);
+              for (const [pageStr, dataUrl] of entries) {
+                const pg = parseInt(pageStr, 10);
+                if (pg >= 1 && pg <= CONFIG.TOTAL_PAGES && dataUrl) {
+                  state.canvasCache.set(pg, dataUrl);
+                  saveCanvasToDB(pg, dataUrl);
+                }
+              }
+            }
+            applyReviewLanguageUI();
+            updateSidebarBadges();
+            restorePageCanvas(state.currentPage);
+            showToast('Khôi phục dữ liệu thành công! 🎉');
+          } catch (err) {
+            showToast('Lỗi đọc file sao lưu JSON!');
+          }
+        };
+        reader.readAsText(file);
+      }
+
       // ==========================================================================
       // 8. SIDEBAR THUMBNAILS, BOOKMARKS & NOTES
       // ==========================================================================
@@ -3082,6 +3316,7 @@
             ? '💡 <strong>Tip:</strong> Tap any card to flip and see its English & Vietnamese meaning plus example!<span class="vi-sub">Mẹo: Chạm từng thẻ để lật xem nghĩa tiếng Anh, tiếng Việt và ví dụ trong sách!</span>'
             : '💡 <strong>Tip:</strong> Tap any card to flip and see its meaning and example from the textbook!';
         }
+        if (DOM.btnNewRandomQuiz) DOM.btnNewRandomQuiz.textContent = bi ? '🎲 New Quiz / Đề mới' : '🎲 New Quiz';
         if (DOM.btnGradeQuiz) DOM.btnGradeQuiz.textContent = bi ? '✅ Check / Chấm điểm' : '✅ Check Answers';
         if (DOM.btnShowAnswers) DOM.btnShowAnswers.textContent = bi ? '👁 Answers / Đáp án' : '👁 Show Answers';
         if (DOM.btnResetQuiz) DOM.btnResetQuiz.textContent = bi ? '🔄 Reset / Làm lại' : '🔄 Reset';
@@ -3279,6 +3514,26 @@
         DOM.reviewUnitsContainer.innerHTML = html;
       }
 
+      function speakMathText(text) {
+        if (!('speechSynthesis' in window)) {
+          showToast('Trình duyệt không hỗ trợ đọc giọng nói.');
+          return;
+        }
+        try {
+          window.speechSynthesis.cancel();
+          const clean = String(text).replace(/\s*\/\s*/g, ', ').replace(/\([^)]*\)/g, '').trim();
+          const utter = new SpeechSynthesisUtterance(clean);
+          utter.lang = 'en-GB';
+          utter.rate = 0.88;
+          const voices = window.speechSynthesis.getVoices();
+          const enVoice = voices.find((v) => v.lang && v.lang.startsWith('en-GB')) ||
+                          voices.find((v) => v.lang && v.lang.startsWith('en-US')) ||
+                          voices.find((v) => v.lang && v.lang.startsWith('en'));
+          if (enVoice) utter.voice = enVoice;
+          window.speechSynthesis.speak(utter);
+        } catch (e) {}
+      }
+
       function renderVocabCards() {
         if (!DOM.vocabGrid) return;
         const bi = state.reviewBilingual;
@@ -3287,7 +3542,10 @@
           html += `
             <div class="vocab-card" data-vocab-idx="${idx}">
               <div>
-                <div class="vocab-en">${item.en}</div>
+                <div class="vocab-top-row">
+                  <div class="vocab-en">${item.en}</div>
+                  <button class="vocab-speak-btn" data-speak-idx="${idx}" title="Listen / Nghe phát âm">🔊</button>
+                </div>
                 <div class="vocab-vi" style="display:none;">
                   <div style="color:#e2e8f0;font-weight:600;font-size:13px;">${item.enDef}</div>
                   ${bi ? `<div style="color:#38bdf8;margin-top:4px;">👉 ${item.vi}</div>` : ''}
@@ -3299,6 +3557,13 @@
           `;
         });
         DOM.vocabGrid.innerHTML = html;
+        DOM.vocabGrid.querySelectorAll('.vocab-speak-btn').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const item = REVIEW_VOCAB[parseInt(btn.dataset.speakIdx, 10)];
+            if (item) speakMathText(item.en);
+          });
+        });
         DOM.vocabGrid.querySelectorAll('.vocab-card').forEach((card) => {
           card.addEventListener('click', () => {
             const flipped = card.classList.toggle('flipped');
@@ -3311,11 +3576,143 @@
         });
       }
 
+      let currentQuizSections = REVIEW_QUIZ_SECTIONS;
+
+      function randInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function pickOne(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+      }
+
+      function generateRandomQuizSections() {
+        // Ex 1: Subtraction within 20 & Subtracting tens
+        const ex1 = [];
+        for (let i = 0; i < 2; i++) {
+          const small = randInt(4, 9);
+          const diff = randInt(4, 9);
+          const big = small + diff;
+          const swap = Math.random() < 0.5;
+          ex1.push({
+            label: `${String.fromCharCode(97 + i)}) Difference between ${swap ? big : small} and ${swap ? small : big} =`,
+            ans: diff
+          });
+        }
+        for (let i = 2; i < 4; i++) {
+          const small = randInt(4, 9);
+          const ans = randInt(3, 9);
+          const big = small + ans;
+          ex1.push({ label: `${String.fromCharCode(97 + i)}) ${big} − ${small} =`, ans });
+        }
+        for (let i = 4; i < 6; i++) {
+          const t1 = randInt(5, 9);
+          const t2 = randInt(1, t1 - 1);
+          ex1.push({ label: `${String.fromCharCode(97 + i)}) ${t1 * 10} − ${t2 * 10} =`, ans: (t1 - t2) * 10 });
+        }
+
+        // Ex 2: TU - U, TU - tens, 2-digit no exchange, Take away machine
+        const tA = randInt(2, 9), uA1 = randInt(4, 9), uA2 = randInt(1, uA1 - 1);
+        const tB1 = randInt(4, 9), uB = randInt(1, 9), tB2 = randInt(1, tB1 - 1);
+        const tC1 = randInt(4, 9), tC2 = randInt(1, tC1 - 1), uC1 = randInt(3, 9), uC2 = randInt(1, uC1 - 1);
+        const tD1 = randInt(4, 9), tD2 = randInt(1, tD1 - 1), uD1 = randInt(3, 9), uD2 = randInt(1, uD1 - 1);
+        const m1 = 30, n1 = randInt(41, 98);
+        const m2 = 40, n2 = randInt(51, 98);
+        const ex2 = [
+          { label: `a) ${tA * 10 + uA1} − ${uA2} =`, ans: tA * 10 + (uA1 - uA2) },
+          { label: `b) ${tB1 * 10 + uB} − ${tB2 * 10} =`, ans: (tB1 - tB2) * 10 + uB },
+          { label: `c) ${tC1 * 10 + uC1} − ${tC2 * 10 + uC2} =`, ans: (tC1 - tC2) * 10 + (uC1 - uC2) },
+          { label: `d) ${tD1 * 10 + uD1} − ${tD2 * 10 + uD2} =`, ans: (tD1 - tD2) * 10 + (uD1 - uD2) },
+          { label: `e) Take away (−${m1}): ${n1} →`, ans: n1 - m1 },
+          { label: `f) Take away (−${m2}): ${n2} →`, ans: n2 - m2 }
+        ];
+
+        // Ex 3: Grouping, Repeated addition & Multiplying
+        const g1 = randInt(2, 5), s1 = pickOne([2, 3, 4, 5]);
+        const g2 = randInt(2, 6), s2 = 10;
+        const g3 = randInt(3, 5), s3 = pickOne([3, 4, 5]);
+        const g4 = randInt(3, 6), s4 = 2;
+        const a5 = pickOne([2, 3, 4, 5]), b5 = pickOne([2, 3, 4, 5].filter((x) => x !== a5));
+        const a6 = pickOne([2, 3, 4, 5, 10]), b6 = randInt(2, 5);
+        const ex3 = [
+          { label: `a) ${g1} groups of ${s1} makes`, ans: g1 * s1 },
+          { label: `b) ${g2} groups of ${s2} makes`, ans: g2 * s2 },
+          { label: `c) ${Array(g3).fill(s3).join(' + ')} = ${s3} × ${g3} =`, ans: s3 * g3 },
+          { label: `d) ${Array(g4).fill(s4).join(' + ')} =`, ans: s4 * g4 },
+          { label: `e) ${a5} × ${b5} = ${b5} × ${a5} =`, ans: a5 * b5 },
+          { label: `f) ${a6} × ${b6} =`, ans: a6 * b6 }
+        ];
+
+        // Ex 4: Multiplying by 1 and 0
+        const k1 = randInt(2, 10), k2 = randInt(2, 10), k3 = randInt(2, 10), k4 = randInt(2, 9), k5 = randInt(2, 10), k6 = randInt(2, 9);
+        const ex4 = [
+          { label: `a) ${k1} × 1 =`, ans: k1 },
+          { label: `b) ${k2} × 0 =`, ans: 0 },
+          { label: `c) [?] × 1 = ${k3} →`, ans: k3 },
+          { label: `d) ${k4} × [?] = 0 →`, ans: 0 },
+          { label: `e) 1 × [?] = ${k5} →`, ans: k5 },
+          { label: `f) [?] × ${k6} = 0 →`, ans: 0 }
+        ];
+
+        // Ex 5: Near doubles & Trios
+        const nd1 = randInt(3, 8);
+        let nd2 = randInt(3, 9);
+        while (nd2 === nd1) nd2 = randInt(3, 9);
+        const tr1a = randInt(3, 8), tr1b = randInt(4, 9), tr1s = tr1a + tr1b;
+        const tr2a = randInt(3, 8), tr2b = randInt(4, 9), tr2s = tr2a + tr2b;
+        const ex5 = [
+          { label: `a) ${nd1} + ${nd1} = ${nd1 * 2} ⇒ ${nd1} + ${nd1 + 1} =`, ans: nd1 * 2 + 1 },
+          { label: `b) ${nd2} + ${nd2} = ${nd2 * 2} ⇒ ${nd2} + ${nd2 + 1} =`, ans: nd2 * 2 + 1 },
+          { label: `c) Trio (${tr1a}, ${tr1b}, ${tr1s}): ${tr1s} − ${tr1a} =`, ans: tr1b },
+          { label: `d) Trio (${tr1a}, ${tr1b}, ${tr1s}): ${tr1s} − ${tr1b} =`, ans: tr1a },
+          { label: `e) Trio (${tr2a}, ${tr2b}, ${tr2s}): ${tr2a} + ${tr2b} =`, ans: tr2s },
+          { label: `f) Trio (${tr2a}, ${tr2b}, ${tr2s}): ${tr2s} − ${tr2a} =`, ans: tr2b }
+        ];
+
+        // Ex 6: 2 & 4 times tables & Sequences
+        const multPool = [2, 3, 4, 5, 6, 7, 8, 9, 10].sort(() => Math.random() - 0.5).slice(0, 3);
+        const eqPair = pickOne([
+          { label: 'd) 4 × 5 = 2 × 10 =', ans: 20 },
+          { label: 'd) 4 × 4 = 2 × 8 =', ans: 16 },
+          { label: 'd) 4 × 3 = 2 × 6 =', ans: 12 },
+          { label: 'd) 5 × 4 = 10 × 2 =', ans: 20 },
+          { label: 'd) 5 × 6 = 10 × 3 =', ans: 30 }
+        ]);
+        const seq2Start = pickOne([2, 4, 6, 8, 10, 12]);
+        const seq4Start = pickOne([4, 8, 12, 16, 20]);
+        const ex6 = [
+          { label: `a) 2 × ${multPool[0]} = ${2 * multPool[0]} ⇒ 4 × ${multPool[0]} =`, ans: 4 * multPool[0] },
+          { label: `b) 2 × ${multPool[1]} = ${2 * multPool[1]} ⇒ 4 × ${multPool[1]} =`, ans: 4 * multPool[1] },
+          { label: `c) 2 × ${multPool[2]} = ${2 * multPool[2]} ⇒ 4 × ${multPool[2]} =`, ans: 4 * multPool[2] },
+          eqPair,
+          { label: `e) Sequence: ${seq2Start}, ${seq2Start + 2}, ${seq2Start + 4}, ${seq2Start + 6}, ... (next)`, ans: seq2Start + 8 },
+          { label: `f) Sequence: ${seq4Start}, ${seq4Start + 4}, ${seq4Start + 8}, ${seq4Start + 12}, ... (next)`, ans: seq4Start + 16 }
+        ];
+
+        return [
+          { title: REVIEW_QUIZ_SECTIONS[0].title, titleVi: REVIEW_QUIZ_SECTIONS[0].titleVi, items: ex1 },
+          { title: REVIEW_QUIZ_SECTIONS[1].title, titleVi: REVIEW_QUIZ_SECTIONS[1].titleVi, items: ex2 },
+          { title: REVIEW_QUIZ_SECTIONS[2].title, titleVi: REVIEW_QUIZ_SECTIONS[2].titleVi, items: ex3 },
+          { title: REVIEW_QUIZ_SECTIONS[3].title, titleVi: REVIEW_QUIZ_SECTIONS[3].titleVi, items: ex4 },
+          { title: REVIEW_QUIZ_SECTIONS[4].title, titleVi: REVIEW_QUIZ_SECTIONS[4].titleVi, items: ex5 },
+          { title: REVIEW_QUIZ_SECTIONS[5].title, titleVi: REVIEW_QUIZ_SECTIONS[5].titleVi, items: ex6 }
+        ];
+      }
+
+      function createNewRandomQuiz() {
+        currentQuizSections = generateRandomQuizSections();
+        renderQuizSections();
+        DOM.quizScoreBadge.textContent = state.reviewBilingual
+          ? 'New random quiz ready! (Đã tạo 36 câu đề mới!) 🎲'
+          : 'New random quiz ready! Fill in the answers 🎲';
+        showToast('🎲 Generated 36 new practice questions!');
+      }
+
       function renderQuizSections() {
         if (!DOM.quizSectionsContainer) return;
         let html = '';
         let qIdx = 0;
-        REVIEW_QUIZ_SECTIONS.forEach((sec) => {
+        currentQuizSections.forEach((sec) => {
           html += `
             <div class="quiz-section">
               <div class="quiz-section-title"><div>${biBlock(sec.title, sec.titleVi)}</div></div>
@@ -3420,6 +3817,7 @@
             document.querySelectorAll('.color-dot').forEach((d) => d.classList.remove('active'));
             dot.classList.add('active');
             state.currentColor = dot.dataset.color;
+            try { localStorage.setItem(CONFIG.STORAGE_KEYS.BRUSH_COLOR, state.currentColor); } catch (e) {}
             if (state.activeTool === 'eraser') {
               DOM.toolPen.click();
             }
@@ -3430,13 +3828,25 @@
         DOM.brushSize.addEventListener('input', (e) => {
           state.brushSize = parseFloat(e.target.value);
           if (DOM.brushSizeLabel) DOM.brushSizeLabel.textContent = state.brushSize;
+          try { localStorage.setItem(CONFIG.STORAGE_KEYS.BRUSH_SIZE, String(state.brushSize)); } catch (e) {}
         });
 
-        // Undo & Redo & Clear
+        // Undo & Redo & Clear & Export
         DOM.btnUndo.addEventListener('click', undo);
         DOM.btnRedo.addEventListener('click', redo);
         DOM.btnClearCanvas.addEventListener('click', clearCurrentCanvas);
+        if (DOM.btnExportPagePng) DOM.btnExportPagePng.addEventListener('click', exportCurrentPagePng);
         if (DOM.btnClearAllPages) DOM.btnClearAllPages.addEventListener('click', clearAllPagesCanvas);
+        if (DOM.btnBackupData) DOM.btnBackupData.addEventListener('click', backupAllDataJson);
+        if (DOM.btnRestoreData && DOM.restoreFileInput) {
+          DOM.btnRestoreData.addEventListener('click', () => DOM.restoreFileInput.click());
+          DOM.restoreFileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+              restoreAllDataJson(e.target.files[0]);
+              e.target.value = '';
+            }
+          });
+        }
 
         // Toggle Draw Mode
         DOM.btnToggleDrawMode.addEventListener('click', toggleDrawMode);
@@ -3460,6 +3870,18 @@
         DOM.btnZoomReset.addEventListener('click', resetZoom);
         DOM.btnRotate.addEventListener('click', rotatePage);
         DOM.btnColorFilter.addEventListener('click', cycleColorFilter);
+        if (DOM.btnToggleViewMode) DOM.btnToggleViewMode.addEventListener('click', () => toggleViewMode());
+
+        // Lọc số trang trong Sidebar
+        if (DOM.thumbSearch) {
+          DOM.thumbSearch.addEventListener('input', () => {
+            const q = DOM.thumbSearch.value.trim();
+            document.querySelectorAll('.thumb-card').forEach((card) => {
+              const pg = String(card.dataset.page || '');
+              card.style.display = (!q || pg.includes(q)) ? '' : 'none';
+            });
+          });
+        }
 
         DOM.btnToggleSidebar.addEventListener('click', () => {
           DOM.sidebar.classList.toggle('collapsed');
@@ -3539,6 +3961,7 @@
             case 'r': case 'R': e.preventDefault(); rotatePage(); break;
             case 'b': case 'B': e.preventDefault(); toggleBookmark(); break;
             case 'm': case 'M': e.preventDefault(); DOM.sidebar.classList.toggle('collapsed'); break;
+            case 'v': case 'V': e.preventDefault(); toggleViewMode(); break;
             case 'f': case 'F': e.preventDefault(); DOM.btnFullscreen.click(); break;
             case 'Escape':
               DOM.helpModal.classList.remove('show');
@@ -3552,6 +3975,10 @@
         });
 
         window.appGoToPage = goToPage;
+        window.appOpenSinglePage = (p) => {
+          toggleViewMode('single');
+          goToPage(p);
+        };
         window.appSwitchMainTab = switchMainTab;
         window.appOpenReviewPage = openBookPageFromReview;
         window.appToggleReviewDone = toggleReviewPageDone;
@@ -3577,7 +4004,8 @@
           });
         });
 
-        // Nút chấm điểm / xem đáp án / làm lại trong bài luyện tập
+        // Nút tạo đề ngẫu nhiên / chấm điểm / xem đáp án / làm lại trong bài luyện tập
+        if (DOM.btnNewRandomQuiz) DOM.btnNewRandomQuiz.addEventListener('click', createNewRandomQuiz);
         if (DOM.btnGradeQuiz) DOM.btnGradeQuiz.addEventListener('click', gradeReviewQuiz);
         if (DOM.btnShowAnswers) DOM.btnShowAnswers.addEventListener('click', showReviewQuizAnswers);
         if (DOM.btnResetQuiz) DOM.btnResetQuiz.addEventListener('click', resetReviewQuiz);
@@ -3607,6 +4035,19 @@
           if (r) state.completedReviewPages = new Set(JSON.parse(r));
           const biSaved = localStorage.getItem(CONFIG.STORAGE_KEYS.REVIEW_BILINGUAL);
           if (biSaved === '1') state.reviewBilingual = true;
+          const savedBrush = parseFloat(localStorage.getItem(CONFIG.STORAGE_KEYS.BRUSH_SIZE));
+          if (!isNaN(savedBrush) && savedBrush >= 0.5 && savedBrush <= 10) {
+            state.brushSize = savedBrush;
+            if (DOM.brushSize) DOM.brushSize.value = savedBrush;
+            if (DOM.brushSizeLabel) DOM.brushSizeLabel.textContent = savedBrush;
+          }
+          const savedColor = localStorage.getItem(CONFIG.STORAGE_KEYS.BRUSH_COLOR);
+          if (savedColor) {
+            state.currentColor = savedColor;
+            document.querySelectorAll('.color-dot').forEach((d) => {
+              d.classList.toggle('active', d.dataset.color === savedColor);
+            });
+          }
         } catch (e) {}
 
         // 2. Khởi tạo IndexedDB
