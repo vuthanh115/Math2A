@@ -1698,7 +1698,8 @@
 
         <!-- Chỉnh độ dày nét -->
         <div class="size-slider-wrap" title="Độ dày nét">
-          <input type="range" id="brushSize" class="size-slider" min="1" max="24" value="3" />
+          <input type="range" id="brushSize" class="size-slider" min="0.5" max="10" step="0.5" value="1.5" />
+          <span id="brushSizeLabel" style="font-size:11px;font-weight:700;color:var(--text-secondary);min-width:22px;text-align:center;">1.5</span>
         </div>
 
         <div class="divider" style="height:28px;"></div>
@@ -2172,7 +2173,7 @@
         isDrawingMode: true,
         activeTool: 'pen', // 'pen' | 'highlighter' | 'eraser'
         currentColor: '#111827',
-        brushSize: 3,
+        brushSize: 1.5,
         isDrawing: false,
         lastPoint: null,
         lastMidPoint: null,
@@ -2214,6 +2215,7 @@
         toolHighlighter: document.getElementById('toolHighlighter'),
         toolEraser: document.getElementById('toolEraser'),
         brushSize: document.getElementById('brushSize'),
+        brushSizeLabel: document.getElementById('brushSizeLabel'),
         btnUndo: document.getElementById('btnUndo'),
         btnRedo: document.getElementById('btnRedo'),
         btnClearCanvas: document.getElementById('btnClearCanvas'),
@@ -2595,14 +2597,14 @@
       function getDynamicLineWidth(pressure) {
         const base = state.brushSize;
         if (state.activeTool === 'highlighter') {
-          return base * 6; // Bút dạ quang bản rộng
+          return Math.max(10, base * 7); // Bút dạ quang bản rộng
         }
         if (state.activeTool === 'eraser') {
-          return base * 8; // Tẩy kích thước to
+          return Math.max(12, base * 9); // Tẩy kích thước vừa tay
         }
-        // Apple Pencil Cảm ứng lực: Lực nhấn điều chỉnh từ 60% đến 150% độ dày
-        const pressureFactor = 0.6 + pressure * 0.9;
-        return Math.max(1, base * pressureFactor);
+        // Apple Pencil Cảm ứng lực: Nét thanh mảnh, lực nhấn điều chỉnh nhẹ 65%–130%
+        const pressureFactor = 0.65 + pressure * 0.65;
+        return Math.max(0.5, base * pressureFactor);
       }
 
       function applyBrushStyle(pressure) {
@@ -3426,7 +3428,8 @@
 
         // Kích thước nét vẽ
         DOM.brushSize.addEventListener('input', (e) => {
-          state.brushSize = parseInt(e.target.value, 10);
+          state.brushSize = parseFloat(e.target.value);
+          if (DOM.brushSizeLabel) DOM.brushSizeLabel.textContent = state.brushSize;
         });
 
         // Undo & Redo & Clear
