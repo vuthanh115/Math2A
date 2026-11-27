@@ -1607,6 +1607,13 @@
       transform: translateY(-1px);
     }
 
+    .tt-row-card.speaking-now {
+      border-color: #fbbf24;
+      background: rgba(245, 158, 11, 0.16);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
+      transform: scale(1.02);
+    }
+
     .tt-equation {
       font-size: 19px;
       font-weight: 800;
@@ -2044,12 +2051,14 @@
             </div>
             <div id="ttLearnActions" style="display:flex;gap:8px;flex-wrap:wrap;">
               <button id="btnTtReadAll" class="btn" style="background:rgba(56,189,248,0.16);color:var(--accent);border-color:rgba(56,189,248,0.35);">🔊 Read Full Table</button>
+              <button id="btnTtCallResponse" class="btn" style="background:rgba(245,158,11,0.16);color:#fbbf24;border-color:rgba(245,158,11,0.4);">🗣️ Ask & Pause 2s</button>
               <button id="btnTtHideAnswers" class="btn">🙈 Hide Answers</button>
             </div>
             <div id="ttDrillScopeWrap" style="display:none;gap:6px;flex-wrap:wrap;align-items:center;">
               <button class="btn active" data-tt-scope="term1" style="height:32px;font-size:12px;">⭐ 2× & 4×</button>
               <button class="btn" data-tt-scope="selected" style="height:32px;font-size:12px;">Current Table</button>
               <button class="btn" data-tt-scope="all" style="height:32px;font-size:12px;">All 1×–10×</button>
+              <button id="btnTtReverseMode" class="btn" style="height:32px;font-size:12px;border-color:rgba(168,85,247,0.45);color:#d8b4fe;">🔀 Reverse (4 × ? = 28)</button>
             </div>
           </div>
         </div>
@@ -2058,7 +2067,9 @@
           <div class="tt-drill-stats">
             <span class="tt-stat-pill" id="ttDrillScore">⭐ Score: 0 / 0</span>
             <span class="tt-stat-pill" id="ttDrillStreak">🔥 Streak: 0</span>
+            <span class="tt-stat-pill" id="ttDrillBest" style="color:#fbbf24;border-color:rgba(245,158,11,0.35);">🏆 Best: 0</span>
           </div>
+          <div id="ttWeakBadge" style="display:none;font-size:12px;font-weight:700;color:#fbbf24;background:rgba(245,158,11,0.15);padding:3px 10px;border-radius:999px;border:1px solid rgba(245,158,11,0.35);">🧠 Review weak spot!</div>
           <div style="display:flex;align-items:center;gap:12px;">
             <div id="ttDrillQuestion" class="tt-drill-question">2 × 3 = ?</div>
             <button id="btnTtSpeakQuestion" class="vocab-speak-btn" title="Listen">🔊</button>
@@ -2151,7 +2162,8 @@
           REVIEW_DONE: 'math2a_review_done_v1',
           REVIEW_BILINGUAL: 'math2a_review_bilingual_v1',
           BRUSH_SIZE: 'math2a_brush_size_v1',
-          BRUSH_COLOR: 'math2a_brush_color_v1'
+          BRUSH_COLOR: 'math2a_brush_color_v1',
+          TT_BEST_STREAK: 'math2a_tt_best_streak_v1'
         }
       };
 
@@ -2555,12 +2567,16 @@
         btnTtModeDrill: document.getElementById('btnTtModeDrill'),
         ttLearnActions: document.getElementById('ttLearnActions'),
         btnTtReadAll: document.getElementById('btnTtReadAll'),
+        btnTtCallResponse: document.getElementById('btnTtCallResponse'),
         btnTtHideAnswers: document.getElementById('btnTtHideAnswers'),
         ttDrillScopeWrap: document.getElementById('ttDrillScopeWrap'),
+        btnTtReverseMode: document.getElementById('btnTtReverseMode'),
         ttLearnContainer: document.getElementById('ttLearnContainer'),
         ttDrillContainer: document.getElementById('ttDrillContainer'),
         ttDrillScore: document.getElementById('ttDrillScore'),
         ttDrillStreak: document.getElementById('ttDrillStreak'),
+        ttDrillBest: document.getElementById('ttDrillBest'),
+        ttWeakBadge: document.getElementById('ttWeakBadge'),
         ttDrillQuestion: document.getElementById('ttDrillQuestion'),
         btnTtSpeakQuestion: document.getElementById('btnTtSpeakQuestion'),
         ttDrillFeedback: document.getElementById('ttDrillFeedback'),
@@ -3564,6 +3580,17 @@
         if (DOM.btnTtModeLearn) DOM.btnTtModeLearn.textContent = bi ? '📖 Learn / Học bảng' : '📖 Learn & Listen';
         if (DOM.btnTtModeDrill) DOM.btnTtModeDrill.textContent = bi ? '⚡ Quick Quiz / Luyện phản xạ' : '⚡ Quick Practice';
         if (DOM.btnTtReadAll) DOM.btnTtReadAll.textContent = bi ? '🔊 Read Table / Đọc cả bảng' : '🔊 Read Full Table';
+        if (DOM.btnTtCallResponse) {
+          DOM.btnTtCallResponse.textContent = ttState.callRunning
+            ? (bi ? '⏹ Stop / Dừng đọc' : '⏹ Stop')
+            : (bi ? '🗣️ Ask & Pause 2s / Hỏi–Dừng 2s' : '🗣️ Ask & Pause 2s');
+        }
+        if (DOM.btnTtReverseMode) {
+          DOM.btnTtReverseMode.textContent = bi ? '🔀 Reverse / Hỏi ngược (4×?=28)' : '🔀 Reverse (4 × ? = 28)';
+        }
+        if (DOM.ttWeakBadge) {
+          DOM.ttWeakBadge.textContent = bi ? '🧠 Review weak spot! (Ôn lại câu vừa sai!)' : '🧠 Review weak spot!';
+        }
         if (DOM.btnTtHideAnswers) {
           DOM.btnTtHideAnswers.textContent = ttState.hideAnswers
             ? (bi ? '👁 Show / Hiện đáp án' : '👁 Show Answers')
@@ -3805,15 +3832,98 @@
         mode: 'learn', // 'learn' | 'drill'
         hideAnswers: false,
         drillScope: 'term1', // 'term1' | 'selected' | 'all'
+        reverseMode: false, // false: a × b = ? | true: a × ? = prod
         score: 0,
         total: 0,
         streak: 0,
-        currentQ: { a: 2, b: 3, ans: 6 },
-        locked: false
+        bestStreak: 0,
+        weakQueue: [], // [{ a, b, dueIn }]
+        currentQ: { a: 2, b: 3, prod: 6, ans: 6, isWeak: false },
+        locked: false,
+        callRunning: false,
+        callTimer: null
       };
+
+      function stopTtCallResponse() {
+        ttState.callRunning = false;
+        clearTimeout(ttState.callTimer);
+        if ('speechSynthesis' in window) {
+          try { window.speechSynthesis.cancel(); } catch (e) {}
+        }
+        document.querySelectorAll('.tt-row-card.speaking-now').forEach((c) => c.classList.remove('speaking-now'));
+        if (DOM.btnTtCallResponse) {
+          DOM.btnTtCallResponse.classList.remove('active');
+          DOM.btnTtCallResponse.textContent = state.reviewBilingual
+            ? '🗣️ Ask & Pause 2s / Hỏi–Dừng 2s'
+            : '🗣️ Ask & Pause 2s';
+        }
+      }
+
+      function startTtCallResponse() {
+        if (ttState.callRunning) {
+          stopTtCallResponse();
+          return;
+        }
+        if (!('speechSynthesis' in window)) {
+          showToast('Trình duyệt không hỗ trợ đọc giọng nói.');
+          return;
+        }
+        ttState.callRunning = true;
+        if (DOM.btnTtCallResponse) {
+          DOM.btnTtCallResponse.classList.add('active');
+          DOM.btnTtCallResponse.textContent = state.reviewBilingual ? '⏹ Stop / Dừng đọc' : '⏹ Stop';
+        }
+
+        const n = ttState.selectedTable;
+        let step = 1;
+
+        function runStep() {
+          if (!ttState.callRunning || step > 10) {
+            stopTtCallResponse();
+            return;
+          }
+          const i = step;
+          const prod = n * i;
+          document.querySelectorAll('.tt-row-card.speaking-now').forEach((c) => c.classList.remove('speaking-now'));
+          const card = DOM.ttLearnContainer.querySelector(`[data-tt-fact="${n}x${i}"]`);
+          const chip = card ? card.querySelector('.tt-ans-chip') : null;
+          if (card) {
+            card.classList.add('speaking-now');
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+          if (chip) {
+            chip.classList.add('hidden-ans');
+            chip.textContent = '?';
+          }
+
+          speakMathText(`${n} times ${i}`);
+          // Pause ~2.5s (includes speaking time + 2s thinking gap)
+          ttState.callTimer = setTimeout(() => {
+            if (!ttState.callRunning) return;
+            if (chip) {
+              chip.classList.remove('hidden-ans');
+              chip.textContent = String(prod);
+            }
+            speakMathText(`equals ${prod}`);
+            ttState.callTimer = setTimeout(() => {
+              if (!ttState.callRunning) return;
+              if (ttState.hideAnswers && chip) {
+                chip.classList.add('hidden-ans');
+                chip.textContent = '?';
+              }
+              step++;
+              runStep();
+            }, 1400);
+          }, 2600);
+        }
+
+        runStep();
+      }
 
       function renderTimesTablesUI() {
         if (!DOM.ttSelectorRow || !DOM.ttLearnContainer) return;
+        stopTtCallResponse();
+        if (DOM.ttDrillBest) DOM.ttDrillBest.textContent = `🏆 Best: ${ttState.bestStreak}`;
         let pillsHtml = '';
         for (let n = 1; n <= 10; n++) {
           const isExam = (n === 2 || n === 4);
@@ -3850,6 +3960,7 @@
         DOM.ttLearnContainer.querySelectorAll('.vocab-speak-btn').forEach((btn) => {
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
+            stopTtCallResponse();
             speakMathText(btn.dataset.ttSpeak);
           });
         });
@@ -3866,6 +3977,7 @@
       }
 
       function setTtMode(mode) {
+        stopTtCallResponse();
         ttState.mode = mode;
         const isDrill = mode === 'drill';
         DOM.btnTtModeLearn.classList.toggle('active', !isDrill);
@@ -3879,29 +3991,59 @@
 
       function nextTtDrillQuestion() {
         ttState.locked = false;
-        let a = ttState.selectedTable;
-        if (ttState.drillScope === 'term1') {
-          a = pickOne([2, 4]);
-        } else if (ttState.drillScope === 'all') {
-          a = randInt(1, 10);
-        }
-        const b = randInt(1, 10);
-        const ans = a * b;
-        ttState.currentQ = { a, b, ans };
 
-        DOM.ttDrillQuestion.textContent = `${a} × ${b} = ?`;
+        // Check weak-spot queue first (repeat missed facts after 1-2 turns)
+        let a = ttState.selectedTable;
+        let b = randInt(1, 10);
+        let isWeak = false;
+
+        ttState.weakQueue.forEach((w) => { w.dueIn -= 1; });
+        const dueIdx = ttState.weakQueue.findIndex((w) => w.dueIn <= 0);
+        if (dueIdx !== -1) {
+          const item = ttState.weakQueue.splice(dueIdx, 1)[0];
+          a = item.a;
+          b = item.b;
+          isWeak = true;
+        } else {
+          if (ttState.drillScope === 'term1') {
+            a = pickOne([2, 4]);
+          } else if (ttState.drillScope === 'all') {
+            a = randInt(1, 10);
+          }
+          b = randInt(1, 10);
+        }
+
+        const prod = a * b;
+        const ans = ttState.reverseMode ? b : prod;
+        ttState.currentQ = { a, b, prod, ans, isWeak };
+
+        if (DOM.ttWeakBadge) DOM.ttWeakBadge.style.display = isWeak ? 'inline-block' : 'none';
+        DOM.ttDrillQuestion.textContent = ttState.reverseMode
+          ? `${a} × ? = ${prod}`
+          : `${a} × ${b} = ?`;
         DOM.ttDrillFeedback.textContent = '';
 
         // Generate 3 plausible distinct distractors
         const opts = new Set([ans]);
-        const deltas = [-a, a, -2, 2, -1, 1, -4, 4, 3, -3, 5, 10];
-        let guard = 0;
-        while (opts.size < 4 && guard < 40) {
-          guard++;
-          const cand = ans + pickOne(deltas);
-          if (cand > 0 && cand !== ans) opts.add(cand);
+        if (ttState.reverseMode) {
+          const deltas = [-2, -1, 1, 2, 3, -3];
+          let guard = 0;
+          while (opts.size < 4 && guard < 40) {
+            guard++;
+            const cand = ans + pickOne(deltas);
+            if (cand >= 1 && cand <= 10 && cand !== ans) opts.add(cand);
+          }
+          while (opts.size < 4) opts.add(randInt(1, 10));
+        } else {
+          const deltas = [-a, a, -2, 2, -1, 1, -4, 4, 3, -3, 5, 10];
+          let guard = 0;
+          while (opts.size < 4 && guard < 40) {
+            guard++;
+            const cand = ans + pickOne(deltas);
+            if (cand > 0 && cand !== ans) opts.add(cand);
+          }
+          while (opts.size < 4) opts.add(randInt(1, 40));
         }
-        while (opts.size < 4) opts.add(randInt(1, 40));
 
         const shuffled = Array.from(opts).sort(() => Math.random() - 0.5);
         DOM.ttDrillOptions.innerHTML = shuffled
@@ -3916,7 +4058,7 @@
       function handleTtDrillChoice(btn) {
         if (ttState.locked) return;
         const chosen = parseInt(btn.dataset.val, 10);
-        const { a, b, ans } = ttState.currentQ;
+        const { a, b, prod, ans } = ttState.currentQ;
         const bi = state.reviewBilingual;
         ttState.total++;
 
@@ -3924,8 +4066,12 @@
           ttState.locked = true;
           ttState.score++;
           ttState.streak++;
+          if (ttState.streak > ttState.bestStreak) {
+            ttState.bestStreak = ttState.streak;
+            try { localStorage.setItem(CONFIG.STORAGE_KEYS.TT_BEST_STREAK, String(ttState.bestStreak)); } catch (e) {}
+          }
           btn.classList.add('correct');
-          DOM.ttDrillQuestion.textContent = `${a} × ${b} = ${ans}`;
+          DOM.ttDrillQuestion.textContent = `${a} × ${b} = ${prod}`;
           DOM.ttDrillFeedback.style.color = '#6ee7b7';
           DOM.ttDrillFeedback.textContent = bi ? '🎉 Correct! (Đúng rồi, giỏi quá!)' : '🎉 Correct! Great job!';
           setTimeout(nextTtDrillQuestion, 700);
@@ -3933,12 +4079,18 @@
           ttState.streak = 0;
           btn.classList.add('wrong');
           btn.disabled = true;
+          // Queue this fact to be repeated in 2 turns for deep memorization
+          const exists = ttState.weakQueue.some((w) => w.a === a && w.b === b);
+          if (!exists) {
+            ttState.weakQueue.push({ a, b, dueIn: 2 });
+          }
           DOM.ttDrillFeedback.style.color = '#fca5a5';
           DOM.ttDrillFeedback.textContent = bi ? 'Oops! Try again (Thử lại nhé con!)' : 'Oops! Try another answer!';
         }
 
         DOM.ttDrillScore.textContent = `⭐ Score: ${ttState.score} / ${ttState.total}`;
         DOM.ttDrillStreak.textContent = `🔥 Streak: ${ttState.streak}`;
+        if (DOM.ttDrillBest) DOM.ttDrillBest.textContent = `🏆 Best: ${ttState.bestStreak}`;
       }
 
       function speakMathText(text) {
@@ -4444,10 +4596,21 @@
         if (DOM.btnTtModeDrill) DOM.btnTtModeDrill.addEventListener('click', () => setTtMode('drill'));
         if (DOM.btnTtReadAll) {
           DOM.btnTtReadAll.addEventListener('click', () => {
+            stopTtCallResponse();
             const n = ttState.selectedTable;
             const lines = [];
             for (let i = 1; i <= 10; i++) lines.push(`${n} times ${i} equals ${n * i}`);
             speakMathText(lines.join('. '));
+          });
+        }
+        if (DOM.btnTtCallResponse) {
+          DOM.btnTtCallResponse.addEventListener('click', startTtCallResponse);
+        }
+        if (DOM.btnTtReverseMode) {
+          DOM.btnTtReverseMode.addEventListener('click', () => {
+            ttState.reverseMode = !ttState.reverseMode;
+            DOM.btnTtReverseMode.classList.toggle('active', ttState.reverseMode);
+            nextTtDrillQuestion();
           });
         }
         if (DOM.btnTtHideAnswers) {
@@ -4473,8 +4636,9 @@
         }
         if (DOM.btnTtSpeakQuestion) {
           DOM.btnTtSpeakQuestion.addEventListener('click', () => {
-            const { a, b } = ttState.currentQ;
-            speakMathText(`What is ${a} times ${b}?`);
+            const { a, b, prod } = ttState.currentQ;
+            if (ttState.reverseMode) speakMathText(`${a} times what equals ${prod}?`);
+            else speakMathText(`What is ${a} times ${b}?`);
           });
         }
       }
@@ -4516,6 +4680,8 @@
               d.classList.toggle('active', d.dataset.color === savedColor);
             });
           }
+          const savedBest = parseInt(localStorage.getItem(CONFIG.STORAGE_KEYS.TT_BEST_STREAK), 10);
+          if (!isNaN(savedBest) && savedBest > 0) ttState.bestStreak = savedBest;
         } catch (e) {}
 
         // 2. Khởi tạo IndexedDB
