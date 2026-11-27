@@ -852,6 +852,581 @@
       opacity: 1;
     }
 
+    /* ==========================================================================
+       6.5. TAB ÔN TẬP HK1 (DEDICATED REVIEW TAB & SIDEBAR CHECKLIST)
+       ========================================================================== */
+    .main-tab-switcher {
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-pill);
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .main-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: var(--radius-pill);
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+      touch-action: manipulation;
+    }
+
+    .main-tab-btn.active {
+      background: var(--accent);
+      color: #04121e;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .main-tab-btn.review-tab-btn.active {
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      color: #1e1b08;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
+    }
+
+    body.mode-review .book-only-ctrl {
+      display: none !important;
+    }
+
+    body.mode-review #bookWorkspace {
+      display: none !important;
+    }
+
+    .review-workspace {
+      display: none;
+      flex: 1;
+      height: calc(100vh - var(--header-height));
+      height: calc(100dvh - var(--header-height));
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.08), transparent 45%),
+                  radial-gradient(circle at bottom left, rgba(245, 158, 11, 0.07), transparent 45%),
+                  var(--bg-primary);
+      padding: 20px 18px 80px;
+    }
+
+    body.mode-review .review-workspace {
+      display: block;
+    }
+
+    .review-container {
+      max-width: 980px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .review-hero {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .review-hero h1 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .review-hero p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .review-progress-box {
+      min-width: 240px;
+      flex: 0 1 280px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+    }
+
+    .review-progress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .review-progress-bar {
+      width: 100%;
+      height: 10px;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-pill);
+      overflow: hidden;
+    }
+
+    .review-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #10b981, #38bdf8);
+      border-radius: var(--radius-pill);
+      transition: width 0.35s ease;
+    }
+
+    .review-subtabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 6px;
+    }
+
+    .review-subtab-btn {
+      flex: 1;
+      min-width: 140px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all var(--transition-fast);
+      touch-action: manipulation;
+    }
+
+    .review-subtab-btn.active {
+      background: var(--accent);
+      color: #04121e;
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+
+    .review-panel {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .review-panel.active {
+      display: flex;
+    }
+
+    .review-note-banner {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #fde68a;
+      line-height: 1.5;
+    }
+
+    /* Unit Cards */
+    .unit-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .unit-card-header {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .unit-card.unit-5 .unit-card-header { background: linear-gradient(90deg, rgba(168, 85, 247, 0.25), rgba(30, 41, 59, 0.4)); }
+    .unit-card.unit-6 .unit-card-header { background: linear-gradient(90deg, rgba(20, 184, 166, 0.25), rgba(30, 41, 59, 0.4)); }
+    .unit-card.unit-7 .unit-card-header { background: linear-gradient(90deg, rgba(239, 68, 68, 0.25), rgba(30, 41, 59, 0.4)); }
+
+    .unit-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .unit-5 .unit-badge { background: #a855f7; color: #fff; }
+    .unit-6 .unit-badge { background: #14b8a6; color: #042f2e; }
+    .unit-7 .unit-badge { background: #ef4444; color: #fff; }
+
+    .unit-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .unit-lessons {
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .lesson-box {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .lesson-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .lesson-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .lesson-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .lesson-formula {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 3px solid var(--accent);
+      padding: 8px 12px;
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+
+    .page-pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .page-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-pill);
+      padding: 5px 10px 5px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      transition: all var(--transition-fast);
+    }
+
+    .page-pill.done {
+      border-color: rgba(16, 185, 129, 0.55);
+      background: rgba(16, 185, 129, 0.14);
+    }
+
+    .page-pill-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--text-muted);
+      background: transparent;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .page-pill.done .page-pill-check {
+      background: var(--success-color);
+      border-color: var(--success-color);
+    }
+
+    .page-pill-open {
+      background: transparent;
+      border: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0;
+    }
+
+    .page-pill-open:hover {
+      color: var(--accent);
+    }
+
+    .page-pill-scope {
+      font-size: 11px;
+      color: #fbbf24;
+      font-weight: 600;
+    }
+
+    /* Flashcards */
+    .vocab-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .vocab-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      cursor: pointer;
+      transition: transform var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+      min-height: 118px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      touch-action: manipulation;
+    }
+
+    .vocab-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .vocab-card.flipped {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: var(--accent);
+    }
+
+    .vocab-en {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .vocab-vi {
+      font-size: 14px;
+      font-weight: 700;
+      color: #38bdf8;
+      margin-top: 6px;
+    }
+
+    .vocab-ex {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    .vocab-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    /* Interactive Quiz */
+    .quiz-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .quiz-score-badge {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fbbf24;
+    }
+
+    .quiz-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .quiz-section {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .quiz-section-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .quiz-items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 10px;
+    }
+
+    .quiz-item {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 14px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      line-height: 1.5;
+    }
+
+    .quiz-input {
+      width: 58px;
+      height: 34px;
+      background: var(--bg-secondary);
+      border: 2px solid var(--bg-tertiary);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+      user-select: text;
+      -webkit-user-select: text;
+      transition: border-color var(--transition-fast), background var(--transition-fast);
+    }
+
+    .quiz-input:focus {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.1);
+    }
+
+    .quiz-input.correct {
+      border-color: var(--success-color);
+      background: rgba(16, 185, 129, 0.18);
+      color: #6ee7b7;
+    }
+
+    .quiz-input.wrong {
+      border-color: var(--danger-color);
+      background: rgba(239, 68, 68, 0.18);
+      color: #fca5a5;
+    }
+
+    /* Sidebar Review List */
+    .sidebar-review-group {
+      margin-bottom: 12px;
+    }
+
+    .sidebar-review-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+      padding: 4px 2px 6px;
+    }
+
+    .sidebar-review-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: border-color var(--transition-fast);
+      font-size: 12px;
+    }
+
+    .sidebar-review-item:hover {
+      border-color: var(--accent);
+    }
+
+    .sidebar-review-item.active-page {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.1);
+    }
+
+    .sidebar-review-item.done {
+      border-color: rgba(16, 185, 129, 0.45);
+    }
+
+    .times-table-mini {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    .times-table-mini th, .times-table-mini td {
+      border: 1px solid var(--border-color);
+      padding: 5px 4px;
+    }
+
+    .times-table-mini th {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--accent);
+    }
+
     /* Responsive cho iPad dọc & Mobile */
     @media (max-width: 860px) {
       .app-title span.text { display: none; }
@@ -875,7 +1450,7 @@
        ========================================================================== -->
   <header class="header">
     <div class="header-left">
-      <button id="btnToggleSidebar" class="btn btn-icon" title="Thanh bên (M)">
+      <button id="btnToggleSidebar" class="btn btn-icon book-only-ctrl" title="Thanh bên (M)">
         <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
       </button>
 
@@ -884,13 +1459,23 @@
           <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
         </svg>
         <span class="text">Math 2A</span>
-        <span class="badge">112 Trang</span>
+        <span class="badge book-only-ctrl">112 Trang</span>
       </div>
 
-      <div class="divider"></div>
+      <!-- CHUYỂN TAB CHÍNH: SÁCH TOÁN / ÔN TẬP HK1 -->
+      <div class="main-tab-switcher" role="tablist" aria-label="Chuyển chế độ học">
+        <button id="btnMainTabBook" class="main-tab-btn active" data-main-tab="book" title="Đọc & viết trực tiếp lên sách">
+          📖 <span>Sách</span>
+        </button>
+        <button id="btnMainTabReview" class="main-tab-btn review-tab-btn" data-main-tab="review" title="Đề cương & Luyện tập Cuối HK1">
+          ⭐ <span>Ôn tập HK1</span>
+        </button>
+      </div>
+
+      <div class="divider book-only-ctrl"></div>
 
       <!-- NÚT BẬT / TẮT CHẾ ĐỘ VẼ APPLE PENCIL -->
-      <button id="btnToggleDrawMode" class="btn btn-draw-toggle active" title="Bật/Tắt Vẽ Bút (P)">
+      <button id="btnToggleDrawMode" class="btn btn-draw-toggle active book-only-ctrl" title="Bật/Tắt Vẽ Bút (P)">
         <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24">
           <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
         </svg>
@@ -898,7 +1483,7 @@
       </button>
 
       <!-- Đổi chế độ xem -->
-      <button id="btnToggleViewMode" class="btn" title="Chuyển chế độ xem (V)">
+      <button id="btnToggleViewMode" class="btn book-only-ctrl" title="Chuyển chế độ xem (V)">
         <svg style="width:16px;height:16px;fill:currentColor" viewBox="0 0 24 24">
           <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
         </svg>
@@ -907,7 +1492,7 @@
     </div>
 
     <!-- ĐIỀU HƯỚNG TRANG -->
-    <div class="header-center">
+    <div class="header-center book-only-ctrl">
       <button id="btnPrevPage" class="btn btn-icon" title="Trang trước (← hoặc A)">
         <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
       </button>
@@ -925,35 +1510,35 @@
 
     <!-- CÔNG CỤ XEM, BỘ LỌC, BOOKMARK -->
     <div class="header-right">
-      <button id="btnColorFilter" class="btn btn-icon" title="Chế độ đọc: Chuẩn / Sepia / Đêm">
+      <button id="btnColorFilter" class="btn btn-icon book-only-ctrl" title="Chế độ đọc: Chuẩn / Sepia / Đêm">
         <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.49 0-.37-.14-.7-.37-.97-.23-.26-.38-.61-.38-1.04 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-4.97-4.03-9-10-9z"/></svg>
       </button>
 
-      <button id="btnZoomOut" class="btn btn-icon" title="Thu nhỏ (-)">
+      <button id="btnZoomOut" class="btn btn-icon book-only-ctrl" title="Thu nhỏ (-)">
         <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
       </button>
 
-      <span id="zoomLabel" class="zoom-level">100%</span>
+      <span id="zoomLabel" class="zoom-level book-only-ctrl">100%</span>
 
-      <button id="btnZoomIn" class="btn btn-icon" title="Phóng to (+)">
+      <button id="btnZoomIn" class="btn btn-icon book-only-ctrl" title="Phóng to (+)">
         <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
       </button>
 
-      <button id="btnZoomReset" class="btn btn-icon" title="Kích thước gốc (0)">
+      <button id="btnZoomReset" class="btn btn-icon book-only-ctrl" title="Kích thước gốc (0)">
         <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
       </button>
 
-      <button id="btnRotate" class="btn btn-icon" title="Xoay ảnh 90° (R)">
+      <button id="btnRotate" class="btn btn-icon book-only-ctrl" title="Xoay ảnh 90° (R)">
         <svg viewBox="0 0 24 24"><path d="M7.34 6.41L.86 12.88l1.41 1.41 4.96-4.96v11.39h2V9.33l4.96 4.96 1.41-1.41L9.12 6.41c-.49-.49-1.29-.49-1.78 0zM21 16.5c0-2.48-2.02-4.5-4.5-4.5s-4.5 2.02-4.5 4.5 2.02 4.5 4.5 4.5 4.5-2.02 4.5-4.5z"/></svg>
       </button>
 
-      <div class="divider"></div>
+      <div class="divider book-only-ctrl"></div>
 
-      <button id="btnBookmark" class="btn btn-icon" title="Đánh dấu trang (B)">
+      <button id="btnBookmark" class="btn btn-icon book-only-ctrl" title="Đánh dấu trang (B)">
         <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
       </button>
 
-      <button id="btnToggleNoteDrawer" class="btn btn-icon" title="Ghi chú trang (N)">
+      <button id="btnToggleNoteDrawer" class="btn btn-icon book-only-ctrl" title="Ghi chú trang (N)">
         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
       </button>
 
@@ -970,7 +1555,7 @@
   <!-- ==========================================================================
        WORKSPACE: SIDEBAR & VIEWER
        ========================================================================== -->
-  <main class="workspace">
+  <main id="bookWorkspace" class="workspace">
 
     <!-- THANH BÊN -->
     <aside id="sidebar" class="sidebar">
@@ -979,13 +1564,17 @@
           <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
           Trang
         </button>
+        <button class="tab-btn" data-tab="tabReview">
+          <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          Ôn tập
+        </button>
         <button class="tab-btn" data-tab="tabBookmarks">
           <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
-          Đánh dấu (<span id="bookmarkCount">0</span>)
+          Lưu (<span id="bookmarkCount">0</span>)
         </button>
         <button class="tab-btn" data-tab="tabNotes">
           <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-          Ghi chú (<span id="notesCount">0</span>)
+          Note (<span id="notesCount">0</span>)
         </button>
       </div>
 
@@ -994,6 +1583,10 @@
           <input type="text" id="thumbSearch" class="search-input" placeholder="Tìm số trang (1 - 112)..." />
         </div>
         <div id="thumbnailsContainer" class="thumbnails-grid"></div>
+      </div>
+
+      <div id="tabReview" class="tab-content">
+        <div id="sidebarReviewList"></div>
       </div>
 
       <div id="tabBookmarks" class="tab-content">
@@ -1099,6 +1692,67 @@
     </section>
   </main>
 
+  <!-- ==========================================================================
+       TAB RIÊNG: ÔN TẬP CUỐI HỌC KÌ 1 (STARTERS 2 - MATH 2A)
+       ========================================================================== -->
+  <section id="reviewWorkspace" class="review-workspace" aria-label="Ôn tập cuối học kì 1">
+    <div class="review-container">
+      <!-- Banner & Tiến độ -->
+      <div class="review-hero">
+        <div>
+          <h1>⭐ Ôn Tập Cuối Học Kì 1 — Math 2A</h1>
+          <p>Chương trình <strong>Starters 2 (2026–2027)</strong> • <em>Macmillan Mathematics 2A</em><br>
+          Chạm vào số trang để mở thẳng trang sách viết bằng Apple Pencil, hoặc luyện làm bài chấm điểm ngay tại đây!</p>
+        </div>
+        <div class="review-progress-box">
+          <div class="review-progress-top">
+            <span>Tiến độ ôn sách</span>
+            <span id="reviewProgressText">0 / 23 trang (0%)</span>
+          </div>
+          <div class="review-progress-bar">
+            <div id="reviewProgressFill" class="review-progress-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 Sub-tabs trong khu vực Ôn tập -->
+      <div class="review-subtabs" role="tablist">
+        <button class="review-subtab-btn active" data-review-tab="panelGuide">📚 Đề cương & Trang sách</button>
+        <button class="review-subtab-btn" data-review-tab="panelVocab">🔤 Từ vựng Toán (19 thẻ)</button>
+        <button class="review-subtab-btn" data-review-tab="panelQuiz">🎯 Luyện đề & Chấm điểm</button>
+      </div>
+
+      <!-- PANEL 1: ĐỀ CƯƠNG & LỘ TRÌNH TRANG SÁCH -->
+      <div id="panelGuide" class="review-panel active">
+        <div class="review-note-banner">
+          📌 <strong>Lưu ý phạm vi thi:</strong> Không thi phần <em>Try this</em> (Tr. 41, 43, 45, 47, 51), không thi <em>Assessment</em> (Tr. 49), bỏ qua Tr. 53, 59, 61 và Ex 2 Tr. 60.
+        </div>
+        <div id="reviewUnitsContainer" style="display:flex;flex-direction:column;gap:16px;"></div>
+      </div>
+
+      <!-- PANEL 2: TỪ VỰNG TOÁN HỌC (FLASHCARDS) -->
+      <div id="panelVocab" class="review-panel">
+        <div class="review-note-banner" style="background:rgba(56,189,248,0.1);border-color:rgba(56,189,248,0.3);color:#bae6fd;">
+          💡 <strong>Mẹo học từ vựng:</strong> Chạm vào từng thẻ để lật xem nghĩa tiếng Việt và ví dụ trong sách Toán!
+        </div>
+        <div id="vocabGrid" class="vocab-grid"></div>
+      </div>
+
+      <!-- PANEL 3: LUYỆN ĐỀ TRỰC TUYẾN & CHẤM ĐIỂM -->
+      <div id="panelQuiz" class="review-panel">
+        <div class="quiz-toolbar">
+          <div id="quizScoreBadge" class="quiz-score-badge">Điền đáp án rồi nhấn "Chấm điểm" nhé! 🌟</div>
+          <div class="quiz-actions">
+            <button id="btnGradeQuiz" class="btn" style="background:var(--success-color);color:#042f2e;font-weight:700;">✅ Chấm điểm</button>
+            <button id="btnShowAnswers" class="btn" style="background:rgba(245,158,11,0.2);color:#fbbf24;border-color:rgba(245,158,11,0.4);">👁 Xem đáp án</button>
+            <button id="btnResetQuiz" class="btn">🔄 Làm lại</button>
+          </div>
+        </div>
+        <div id="quizSectionsContainer" style="display:flex;flex-direction:column;gap:14px;"></div>
+      </div>
+    </div>
+  </section>
+
   <!-- MODAL HƯỚNG DẪN -->
   <div id="helpModal" class="modal-backdrop">
     <div class="modal-card">
@@ -1149,9 +1803,250 @@
           BOOKMARKS: 'math2a_bookmarks',
           NOTES: 'math2a_notes',
           VIEW_MODE: 'math2a_view_mode',
-          COLOR_FILTER: 'math2a_color_filter'
+          COLOR_FILTER: 'math2a_color_filter',
+          REVIEW_DONE: 'math2a_review_done_v1'
         }
       };
+
+      // --- DỮ LIỆU ĐỀ CƯƠNG ÔN TẬP CUỐI HK1 (STARTERS 2 - 2026-2027) ---
+      const REVIEW_UNITS = [
+        {
+          id: 'unit-5',
+          badge: 'Unit 5',
+          title: 'Subtraction within 99 (Phép trừ trong phạm vi 99)',
+          lessons: [
+            {
+              name: '1. Subtraction within 20 (Trừ trong phạm vi 20)',
+              desc: 'Tìm hiệu (difference) giữa 2 số bằng cách đếm thêm (count on) trên tia số qua mốc 10.',
+              formula: 'Ví dụ: Hiệu của 8 và 17 → 8 lên 10 là 2, 10 lên 17 là 7 → 2 + 7 = 9 (hay 17 − 8 = 9).',
+              pages: [
+                { page: 40, scope: 'Toàn bộ', note: 'Ex 1: Tìm hiệu trên tia số' },
+                { page: 41, scope: 'Ex 2, 3', note: 'Chỉ ôn Ex 2, 3 (bỏ Try this)' }
+              ]
+            },
+            {
+              name: '2. Subtracting tens (Trừ các số tròn chục)',
+              desc: 'Dùng phép trừ trong phạm vi 10 để trừ các số tròn chục (tens).',
+              formula: '8 − 3 = 5  ⇒  8 tens − 3 tens = 5 tens  ⇒  80 − 30 = 50.',
+              pages: [
+                { page: 42, scope: 'Toàn bộ', note: 'Ex 1: Trừ số tròn chục' },
+                { page: 43, scope: 'Ex 2, 3', note: 'Chỉ ôn Ex 2, 3 (bỏ Try this)' }
+              ]
+            },
+            {
+              name: '3. Subtracting: TU − U (Trừ số 2 chữ số cho số 1 chữ số)',
+              desc: 'Tách chục & đơn vị hoặc đặt tính theo cột (trừ hàng đơn vị trước, rồi hàng chục).',
+              formula: '47 − 5 = 40 + (7 − 5) = 40 + 2 = 42.',
+              pages: [
+                { page: 44, scope: 'Toàn bộ', note: 'Ex 1: Tách chục và đơn vị' },
+                { page: 45, scope: 'Ex 2, 3', note: 'Chỉ ôn Ex 2, 3 (bỏ Try this)' }
+              ]
+            },
+            {
+              name: '4. Subtracting TU and tens (Trừ số 2 chữ số cho số tròn chục)',
+              desc: 'Giữ nguyên hàng đơn vị, chỉ trừ hàng chục. Luyện máy trừ (Take away machines −40, −30).',
+              formula: '54 − 20 = (50 − 20) + 4 = 30 + 4 = 34.',
+              pages: [
+                { page: 46, scope: 'Toàn bộ', note: 'Ex 1: Che thanh chục để tính' },
+                { page: 47, scope: 'Ex 2, 3', note: 'Chỉ ôn Ex 2, 3 (bỏ Try this)' }
+              ]
+            },
+            {
+              name: '5. Subtracting 2-digit numbers: no exchange (Trừ 2 số 2 chữ số không nhớ)',
+              desc: 'Đặt tính thẳng cột T U: Bước 1 trừ hàng đơn vị (units), Bước 2 trừ hàng chục (tens).',
+              formula: '67 − 35: Đơn vị 7 − 5 = 2, Chục 60 − 30 = 30 ⇒ 32.',
+              pages: [
+                { page: 48, scope: 'Toàn bộ', note: 'Ex 1: Trừ có hình minh họa' },
+                { page: 49, scope: 'Ex 2', note: 'Chỉ ôn Ex 2 (bỏ Assessment)' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'unit-6',
+          badge: 'Unit 6',
+          title: 'Multiplication (Phép nhân)',
+          lessons: [
+            {
+              name: '1. Grouping (Đếm theo nhóm)',
+              desc: 'Đếm số nhóm và số vật trong mỗi nhóm theo mẫu câu chuẩn của sách.',
+              formula: '5 groups of 3 makes 15 (5 nhóm, mỗi nhóm 3 đồ vật = 15).',
+              pages: [
+                { page: 50, scope: 'Toàn bộ', note: 'Ex 1: Điền số nhóm & tổng' },
+                { page: 51, scope: 'Ex 2', note: 'Chỉ ôn Ex 2 (bỏ Try this)' }
+              ]
+            },
+            {
+              name: '2. Repeated addition (Phép cộng lặp lại)',
+              desc: 'Cộng nhiều nhóm bằng nhau liên tiếp.',
+              formula: '3 nhóm 4 ⇒ 4 + 4 + 4 = 12.',
+              pages: [
+                { page: 52, scope: 'Toàn bộ', note: 'Ex 1: Cộng lặp lại (bỏ Tr. 53)' }
+              ]
+            },
+            {
+              name: '3. Multiplying (Phép nhân với dấu ×)',
+              desc: 'Chuyển từ phép cộng lặp lại sang phép nhân bằng dấu × (multiplied by).',
+              formula: '5 + 5 + 5 = 15  ⇒  5 multiplied by 3 = 15  ⇒  5 × 3 = 15.',
+              pages: [
+                { page: 54, scope: 'Toàn bộ', note: 'Ex 1: Phép cộng & multiplied by' },
+                { page: 55, scope: 'Toàn bộ', note: 'Ex 2, 3: Vẽ hạt & viết phép nhân' }
+              ]
+            },
+            {
+              name: '4. Arrays (Mảng — Tính chất giao hoán)',
+              desc: 'Đếm theo hàng ngang hay cột dọc đều cho cùng một kết quả.',
+              formula: '3 × 4 = 12 và 4 × 3 = 12 (3 × 4 có cùng đáp án với 4 × 3).',
+              pages: [
+                { page: 56, scope: 'Toàn bộ', note: 'Ex 1: Tính phép nhân từ hình' },
+                { page: 57, scope: 'Toàn bộ', note: 'Ex 2, 3: Viết & khoanh nhóm phép nhân' }
+              ]
+            },
+            {
+              name: '5. Multiplying by 1 and 0 (Nhân với 1 và 0)',
+              desc: 'Số nào nhân với 1 cũng bằng chính nó. Số nào nhân với 0 cũng bằng 0.',
+              formula: '6 × 1 = 6  |  1 × 6 = 6  |  6 × 0 = 0  |  0 × 6 = 0.',
+              pages: [
+                { page: 58, scope: 'Toàn bộ', note: 'Ex 1: Nhân 1 và 0 (bỏ Tr. 59)' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'unit-7',
+          badge: 'Unit 7',
+          title: 'Number facts (Bảng cộng, trừ, nhân cơ bản)',
+          lessons: [
+            {
+              name: '1. Adding to 20 — Near doubles (Cộng nhẩm gần số nhân đôi)',
+              desc: 'Dùng phép cộng 2 số giống nhau rồi cộng thêm 1 để tính nhanh.',
+              formula: '4 + 4 = 8 ⇒ 4 + 5 = 9  |  6 + 6 = 12 ⇒ 6 + 7 = 13.',
+              pages: [
+                { page: 60, scope: 'Ex 1', note: 'Chỉ ôn Ex 1 (bỏ Ex 2 & Tr. 61)' }
+              ]
+            },
+            {
+              name: '2. Addition and subtraction trios (Bộ ba số cộng – trừ)',
+              desc: 'Phép trừ là phép toán ngược (inverse) của phép cộng. 1 bộ 3 số lập được 4 phép tính.',
+              formula: 'Bộ ba (4, 7, 11) ⇒ 4 + 7 = 11, 7 + 4 = 11, 11 − 4 = 7, 11 − 7 = 4.',
+              pages: [
+                { page: 62, scope: 'Toàn bộ', note: 'Ex 1: Viết 4 phép tính bộ ba số' },
+                { page: 63, scope: 'Toàn bộ', note: 'Ex 2, 3: Điền ô trống & phép tính ngược' }
+              ]
+            },
+            {
+              name: '3. Multiplication facts for 2 and 4 (Bảng nhân 2 và bảng nhân 4)',
+              desc: 'Bảng nhân 4 bằng gấp đôi (double) bảng nhân 2 và luôn là số chẵn (even numbers).',
+              formula: '2 × 3 = 6 → double → 4 × 3 = 12  |  2 × 5 = 10 → double → 4 × 5 = 20.',
+              hasTimesTable: true,
+              pages: [
+                { page: 64, scope: 'Toàn bộ', note: 'Ex 1: Bảng nhân 2 và nhân 4' },
+                { page: 65, scope: 'Toàn bộ', note: 'Ex 2, 3: Dãy số (+2, +4) & tính nhanh' }
+              ]
+            }
+          ]
+        }
+      ];
+
+      const REVIEW_VOCAB = [
+        { en: 'subtraction / subtract', vi: 'phép trừ / trừ đi', ex: 'Subtract the units, then subtract the tens.' },
+        { en: 'difference', vi: 'hiệu (kết quả phép trừ)', ex: 'What is the difference between 8 and 17?' },
+        { en: 'count on', vi: 'đếm thêm', ex: 'Count on from 8 to 17.' },
+        { en: 'number line', vi: 'tia số', ex: 'Use the number line to help.' },
+        { en: 'tens (T) / units (U)', vi: 'hàng chục / hàng đơn vị', ex: 'Break up 47 into tens and units.' },
+        { en: 'rods', vi: 'thanh chục (10 ô)', ex: 'Cross out / Cover the rods.' },
+        { en: 'take away', vi: 'bớt đi, lấy đi (trừ)', ex: 'Take away machines (-40, -30).' },
+        { en: 'no exchange', vi: 'không nhớ (không mượn)', ex: 'Subtracting 2-digit numbers: no exchange.' },
+        { en: 'multiplication / multiply', vi: 'phép nhân / nhân với', ex: '5 multiplied by 3 = 15 (5 × 3 = 15).' },
+        { en: 'grouping / groups of', vi: 'nhóm / nhóm gồm ...', ex: '5 groups of 3 makes 15.' },
+        { en: 'altogether', vi: 'tất cả, tổng cộng', ex: 'How many balloons are there altogether?' },
+        { en: 'repeated addition', vi: 'phép cộng lặp lại', ex: '4 + 4 + 4 = 12.' },
+        { en: 'arrays / rows', vi: 'mảng / các hàng', ex: 'These lettuces are planted in rows.' },
+        { en: 'near doubles', vi: 'gần số nhân đôi', ex: '4 + 4 = 8 → 4 + 5 is 1 more → 9.' },
+        { en: 'trios', vi: 'bộ ba số (cộng – trừ)', ex: '4, 7, 11 → 4 + 7 = 11, 11 - 4 = 7.' },
+        { en: 'inverse', vi: 'phép toán ngược', ex: 'Subtraction is the inverse of addition.' },
+        { en: 'times table', vi: 'bảng nhân', ex: '2 times table, 4 times table.' },
+        { en: 'double', vi: 'gấp đôi', ex: '4 times table is double the 2 times table.' },
+        { en: 'even numbers / sequence', vi: 'số chẵn / dãy số', ex: 'Write the next two numbers in each sequence.' }
+      ];
+
+      const REVIEW_QUIZ_SECTIONS = [
+        {
+          title: 'Unit 5 • Bài 1: Trừ trong phạm vi 20 & Trừ số tròn chục',
+          items: [
+            { label: 'a) Difference between 9 and 16 =', ans: 7 },
+            { label: 'b) Difference between 7 and 15 =', ans: 8 },
+            { label: 'c) 14 − 8 =', ans: 6 },
+            { label: 'd) 13 − 6 =', ans: 7 },
+            { label: 'e) 80 − 30 =', ans: 50 },
+            { label: 'f) 90 − 50 =', ans: 40 }
+          ]
+        },
+        {
+          title: 'Unit 5 • Bài 2: Trừ TU − U, TU − tens & 2 chữ số không nhớ',
+          items: [
+            { label: 'a) 69 − 5 =', ans: 64 },
+            { label: 'b) 87 − 40 =', ans: 47 },
+            { label: 'c) 78 − 35 =', ans: 43 },
+            { label: 'd) 96 − 62 =', ans: 34 },
+            { label: 'e) Máy −30: 54 →', ans: 24 },
+            { label: 'f) Máy −40: 88 →', ans: 48 }
+          ]
+        },
+        {
+          title: 'Unit 6 • Bài 3: Nhóm (Grouping), Cộng lặp lại & Phép nhân',
+          items: [
+            { label: 'a) 4 groups of 3 makes', ans: 12 },
+            { label: 'b) 3 groups of 10 makes', ans: 30 },
+            { label: 'c) 5 + 5 + 5 + 5 = 5 × 4 =', ans: 20 },
+            { label: 'd) 2 + 2 + 2 + 2 + 2 + 2 =', ans: 12 },
+            { label: 'e) 3 × 4 = 4 × 3 =', ans: 12 },
+            { label: 'f) 5 × 3 =', ans: 15 }
+          ]
+        },
+        {
+          title: 'Unit 6 • Bài 4: Nhân với 1 và 0 (Điền số còn thiếu)',
+          items: [
+            { label: 'a) 7 × 1 =', ans: 7 },
+            { label: 'b) 9 × 0 =', ans: 0 },
+            { label: 'c) [?] × 1 = 5 →', ans: 5 },
+            { label: 'd) 4 × [?] = 0 →', ans: 0 },
+            { label: 'e) 1 × [?] = 8 →', ans: 8 },
+            { label: 'f) [?] × 6 = 0 →', ans: 0 }
+          ]
+        },
+        {
+          title: 'Unit 7 • Bài 5: Near doubles & Bộ ba số (Trios)',
+          items: [
+            { label: 'a) 6 + 6 = 12 ⇒ 6 + 7 =', ans: 13 },
+            { label: 'b) 8 + 8 = 16 ⇒ 8 + 9 =', ans: 17 },
+            { label: 'c) Trio (6, 9, 15): 15 − 6 =', ans: 9 },
+            { label: 'd) Trio (6, 9, 15): 15 − 9 =', ans: 6 },
+            { label: 'e) Trio (5, 8, 13): 5 + 8 =', ans: 13 },
+            { label: 'f) Trio (5, 8, 13): 13 − 5 =', ans: 8 }
+          ]
+        },
+        {
+          title: 'Unit 7 • Bài 6: Bảng nhân 2, Bảng nhân 4 & Dãy số (Sequences)',
+          items: [
+            { label: 'a) 2 × 6 = 12 ⇒ 4 × 6 =', ans: 24 },
+            { label: 'b) 2 × 9 = 18 ⇒ 4 × 9 =', ans: 36 },
+            { label: 'c) 2 × 7 = 14 ⇒ 4 × 7 =', ans: 28 },
+            { label: 'd) 4 × 5 = 2 × 10 =', ans: 20 },
+            { label: 'e) Dãy 4, 6, 8, 10, ... (số tiếp theo)', ans: 12 },
+            { label: 'f) Dãy 12, 16, 20, 24, ... (số tiếp theo)', ans: 28 }
+          ]
+        }
+      ];
+
+      const ALL_REVIEW_PAGES = [];
+      REVIEW_UNITS.forEach((u) => {
+        u.lessons.forEach((l) => {
+          l.pages.forEach((p) => {
+            ALL_REVIEW_PAGES.push({ ...p, unitId: u.id, unitBadge: u.badge, lessonName: l.name });
+          });
+        });
+      });
 
       // --- TRẠNG THÁI ỨNG DỤNG ---
       const state = {
@@ -1167,6 +2062,8 @@
         bookmarks: new Set(),
         notes: {},
         pagesWithInk: new Set(), // Danh sách các trang có nét vẽ
+        activeMainTab: 'book', // 'book' | 'review'
+        completedReviewPages: new Set(),
         // Drawing engine state
         isDrawingMode: true,
         activeTool: 'pen', // 'pen' | 'highlighter' | 'eraser'
@@ -1236,7 +2133,21 @@
         // Modals
         helpModal: document.getElementById('helpModal'),
         btnCloseHelpModal: document.getElementById('btnCloseHelpModal'),
-        toast: document.getElementById('toast')
+        toast: document.getElementById('toast'),
+        // Review Tab HK1
+        btnMainTabBook: document.getElementById('btnMainTabBook'),
+        btnMainTabReview: document.getElementById('btnMainTabReview'),
+        reviewWorkspace: document.getElementById('reviewWorkspace'),
+        sidebarReviewList: document.getElementById('sidebarReviewList'),
+        reviewUnitsContainer: document.getElementById('reviewUnitsContainer'),
+        vocabGrid: document.getElementById('vocabGrid'),
+        quizSectionsContainer: document.getElementById('quizSectionsContainer'),
+        reviewProgressText: document.getElementById('reviewProgressText'),
+        reviewProgressFill: document.getElementById('reviewProgressFill'),
+        quizScoreBadge: document.getElementById('quizScoreBadge'),
+        btnGradeQuiz: document.getElementById('btnGradeQuiz'),
+        btnShowAnswers: document.getElementById('btnShowAnswers'),
+        btnResetQuiz: document.getElementById('btnResetQuiz')
       };
 
       const ctx = DOM.drawCanvas.getContext('2d', { willReadFrequently: true });
@@ -1776,6 +2687,7 @@
         });
 
         updateActiveThumbnail();
+        renderSidebarReviewList();
       }
 
       function nextPage() {
@@ -1927,6 +2839,8 @@
 
         renderBookmarksList();
         renderNotesList();
+        renderSidebarReviewList();
+        updateReviewProgressUI();
       }
 
       function renderBookmarksList() {
@@ -1993,6 +2907,258 @@
       function updateNoteDrawer() {
         DOM.notePageNumber.textContent = state.currentPage;
         DOM.pageNoteInput.value = state.notes[state.currentPage] || '';
+      }
+
+      // ==========================================================================
+      // 8.5. TAB ÔN TẬP CUỐI HK1 (LỘ TRÌNH, FLASHCARD, LUYỆN ĐỀ CHẤM ĐIỂM)
+      // ==========================================================================
+      function switchMainTab(tabName) {
+        state.activeMainTab = tabName === 'review' ? 'review' : 'book';
+        const isReview = state.activeMainTab === 'review';
+        document.body.classList.toggle('mode-review', isReview);
+        DOM.btnMainTabBook.classList.toggle('active', !isReview);
+        DOM.btnMainTabReview.classList.toggle('active', isReview);
+
+        if (isReview) {
+          updateReviewProgressUI();
+        } else {
+          setTimeout(() => {
+            resizeCanvasToMatchImage();
+            applyTransformations();
+          }, 50);
+        }
+      }
+
+      function saveReviewDone() {
+        try {
+          localStorage.setItem(
+            CONFIG.STORAGE_KEYS.REVIEW_DONE,
+            JSON.stringify(Array.from(state.completedReviewPages))
+          );
+        } catch (e) {}
+      }
+
+      function toggleReviewPageDone(pageNumber) {
+        if (state.completedReviewPages.has(pageNumber)) {
+          state.completedReviewPages.delete(pageNumber);
+        } else {
+          state.completedReviewPages.add(pageNumber);
+        }
+        saveReviewDone();
+        renderReviewUnits();
+        renderSidebarReviewList();
+        updateReviewProgressUI();
+      }
+
+      function openBookPageFromReview(pageNumber) {
+        const info = ALL_REVIEW_PAGES.find((p) => p.page === pageNumber);
+        switchMainTab('book');
+        goToPage(pageNumber);
+        if (info) {
+          showToast(`Trang ${pageNumber} (${info.scope}) — ${info.note}`);
+        }
+      }
+
+      function updateReviewProgressUI() {
+        if (!DOM.reviewProgressText || !DOM.reviewProgressFill) return;
+        const total = ALL_REVIEW_PAGES.length;
+        const done = ALL_REVIEW_PAGES.filter((p) => state.completedReviewPages.has(p.page)).length;
+        const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+        DOM.reviewProgressText.textContent = `${done} / ${total} trang (${pct}%)`;
+        DOM.reviewProgressFill.style.width = `${pct}%`;
+      }
+
+      function renderSidebarReviewList() {
+        if (!DOM.sidebarReviewList) return;
+        let html = `
+          <div style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
+            <span style="font-size:12px;font-weight:700;color:#fbbf24;">⭐ Đề cương HK1 (${ALL_REVIEW_PAGES.length} trang)</span>
+            <button class="btn" style="height:26px;padding:0 8px;font-size:11px;background:rgba(245,158,11,0.18);color:#fbbf24;border-color:rgba(245,158,11,0.35);" onclick="window.appSwitchMainTab('review')">Mở đầy đủ</button>
+          </div>
+        `;
+        REVIEW_UNITS.forEach((unit) => {
+          html += `<div class="sidebar-review-group"><div class="sidebar-review-title">${unit.badge}: ${unit.title.split('(')[0].trim()}</div>`;
+          unit.lessons.forEach((lesson) => {
+            lesson.pages.forEach((p) => {
+              const isDone = state.completedReviewPages.has(p.page);
+              const isCurrent = state.currentPage === p.page;
+              const hasInk = state.pagesWithInk.has(p.page);
+              html += `
+                <div class="sidebar-review-item ${isDone ? 'done' : ''} ${isCurrent ? 'active-page' : ''}" onclick="window.appOpenReviewPage(${p.page})">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <button class="page-pill-check" style="${isDone ? 'background:var(--success-color);border-color:var(--success-color);' : ''}" title="Đánh dấu đã ôn xong" onclick="event.stopPropagation(); window.appToggleReviewDone(${p.page})">${isDone ? '✓' : ''}</button>
+                    <div>
+                      <div style="font-weight:700;color:var(--text-primary);">Trang ${p.page} <span class="page-pill-scope">• ${p.scope}</span></div>
+                      <div style="font-size:11px;color:var(--text-muted);">${p.note}</div>
+                    </div>
+                  </div>
+                  ${hasInk ? '<span style="color:var(--success-color);font-weight:700;" title="Bé đã viết bài trên trang này">✎</span>' : ''}
+                </div>
+              `;
+            });
+          });
+          html += `</div>`;
+        });
+        DOM.sidebarReviewList.innerHTML = html;
+      }
+
+      function renderReviewUnits() {
+        if (!DOM.reviewUnitsContainer) return;
+        let html = '';
+        REVIEW_UNITS.forEach((unit) => {
+          const unitPages = [];
+          unit.lessons.forEach((l) => l.pages.forEach((p) => unitPages.push(p.page)));
+          const unitDone = unitPages.filter((pg) => state.completedReviewPages.has(pg)).length;
+
+          html += `
+            <div class="unit-card ${unit.id}">
+              <div class="unit-card-header">
+                <div class="unit-title">
+                  <span class="unit-badge">${unit.badge}</span>
+                  <span>${unit.title}</span>
+                </div>
+                <span style="font-size:12px;font-weight:700;color:var(--text-secondary);white-space:nowrap;">${unitDone}/${unitPages.length} trang</span>
+              </div>
+              <div class="unit-lessons">
+          `;
+
+          unit.lessons.forEach((lesson) => {
+            html += `
+              <div class="lesson-box">
+                <div class="lesson-header">
+                  <div class="lesson-name">${lesson.name}</div>
+                </div>
+                <div class="lesson-desc">${lesson.desc}</div>
+                <div class="lesson-formula">${lesson.formula}</div>
+            `;
+
+            if (lesson.hasTimesTable) {
+              html += `
+                <table class="times-table-mini">
+                  <tr><th>×</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
+                  <tr><th>2 ×</th><td>2</td><td>4</td><td>6</td><td>8</td><td>10</td><td>12</td><td>14</td><td>16</td><td>18</td><td>20</td></tr>
+                  <tr><th>4 ×</th><td>4</td><td>8</td><td>12</td><td>16</td><td>20</td><td>24</td><td>28</td><td>32</td><td>36</td><td>40</td></tr>
+                </table>
+              `;
+            }
+
+            html += `<div class="page-pills-row">`;
+            lesson.pages.forEach((p) => {
+              const isDone = state.completedReviewPages.has(p.page);
+              const hasInk = state.pagesWithInk.has(p.page);
+              html += `
+                <div class="page-pill ${isDone ? 'done' : ''}">
+                  <button class="page-pill-check" title="Đánh dấu đã ôn xong" onclick="window.appToggleReviewDone(${p.page})">${isDone ? '✓' : ''}</button>
+                  <button class="page-pill-open" title="Mở Trang ${p.page} trong sách để viết Apple Pencil" onclick="window.appOpenReviewPage(${p.page})">
+                    <span>Tr. ${p.page}</span>
+                    <span class="page-pill-scope">(${p.scope})</span>
+                    ${hasInk ? '<span style="color:var(--success-color);">✎</span>' : ''}
+                    <span style="opacity:0.65;">→</span>
+                  </button>
+                </div>
+              `;
+            });
+            html += `</div></div>`;
+          });
+
+          html += `</div></div>`;
+        });
+        DOM.reviewUnitsContainer.innerHTML = html;
+      }
+
+      function renderVocabCards() {
+        if (!DOM.vocabGrid) return;
+        let html = '';
+        REVIEW_VOCAB.forEach((item, idx) => {
+          html += `
+            <div class="vocab-card" data-vocab-idx="${idx}">
+              <div>
+                <div class="vocab-en">${item.en}</div>
+                <div class="vocab-vi" style="display:none;">👉 ${item.vi}</div>
+                <div class="vocab-ex" style="display:none;">"${item.ex}"</div>
+              </div>
+              <div class="vocab-hint">Chạm để xem nghĩa ↻</div>
+            </div>
+          `;
+        });
+        DOM.vocabGrid.innerHTML = html;
+        DOM.vocabGrid.querySelectorAll('.vocab-card').forEach((card) => {
+          card.addEventListener('click', () => {
+            const flipped = card.classList.toggle('flipped');
+            card.querySelector('.vocab-vi').style.display = flipped ? 'block' : 'none';
+            card.querySelector('.vocab-ex').style.display = flipped ? 'block' : 'none';
+            card.querySelector('.vocab-hint').textContent = flipped ? 'Chạm để ẩn nghĩa ↻' : 'Chạm để xem nghĩa ↻';
+          });
+        });
+      }
+
+      function renderQuizSections() {
+        if (!DOM.quizSectionsContainer) return;
+        let html = '';
+        let qIdx = 0;
+        REVIEW_QUIZ_SECTIONS.forEach((sec) => {
+          html += `
+            <div class="quiz-section">
+              <div class="quiz-section-title">${sec.title}</div>
+              <div class="quiz-items-grid">
+          `;
+          sec.items.forEach((item) => {
+            html += `
+              <div class="quiz-item">
+                <span>${item.label}</span>
+                <input type="number" inputmode="numeric" class="quiz-input" data-qid="${qIdx}" data-ans="${item.ans}" placeholder="?" />
+              </div>
+            `;
+            qIdx++;
+          });
+          html += `</div></div>`;
+        });
+        DOM.quizSectionsContainer.innerHTML = html;
+      }
+
+      function gradeReviewQuiz() {
+        const inputs = DOM.quizSectionsContainer.querySelectorAll('.quiz-input');
+        let correct = 0;
+        inputs.forEach((inp) => {
+          const expected = String(inp.dataset.ans);
+          const actual = inp.value.trim();
+          inp.classList.remove('correct', 'wrong');
+          if (actual !== '' && actual === expected) {
+            inp.classList.add('correct');
+            correct++;
+          } else {
+            inp.classList.add('wrong');
+          }
+        });
+        const total = inputs.length;
+        const pct = Math.round((correct / total) * 100);
+        let praise = 'Cố lên con nhé! 💪';
+        if (pct === 100) praise = 'Xuất sắc tuyệt đối! 🏆🌟';
+        else if (pct >= 80) praise = 'Giỏi lắm con ơi! 🎉';
+        else if (pct >= 50) praise = 'Khá tốt rồi, xem lại các câu màu đỏ nhé! 👍';
+        DOM.quizScoreBadge.textContent = `Kết quả: ${correct} / ${total} câu đúng (${pct}%) — ${praise}`;
+        showToast(`Bé làm đúng ${correct}/${total} câu (${pct}%)!`);
+      }
+
+      function showReviewQuizAnswers() {
+        const inputs = DOM.quizSectionsContainer.querySelectorAll('.quiz-input');
+        inputs.forEach((inp) => {
+          inp.value = inp.dataset.ans;
+          inp.classList.remove('wrong');
+          inp.classList.add('correct');
+        });
+        DOM.quizScoreBadge.textContent = `Đã hiện toàn bộ ${inputs.length} đáp án mẫu 👀`;
+        showToast('Đã điền toàn bộ đáp án mẫu');
+      }
+
+      function resetReviewQuiz() {
+        const inputs = DOM.quizSectionsContainer.querySelectorAll('.quiz-input');
+        inputs.forEach((inp) => {
+          inp.value = '';
+          inp.classList.remove('correct', 'wrong');
+        });
+        DOM.quizScoreBadge.textContent = 'Điền đáp án rồi nhấn "Chấm điểm" nhé! 🌟';
+        showToast('Đã làm mới bài luyện tập!');
       }
 
       // ==========================================================================
@@ -2122,6 +3288,10 @@
         window.addEventListener('keydown', (e) => {
           const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
           if (tag === 'input' || tag === 'textarea') return;
+          if (state.activeMainTab === 'review') {
+            if (e.key === 'Escape') DOM.helpModal.classList.remove('show');
+            return;
+          }
 
           if (e.ctrlKey || e.metaKey) {
             if (e.key === 'z' || e.key === 'Z') { e.preventDefault(); undo(); return; }
@@ -2154,11 +3324,34 @@
         });
 
         window.appGoToPage = goToPage;
+        window.appSwitchMainTab = switchMainTab;
+        window.appOpenReviewPage = openBookPageFromReview;
+        window.appToggleReviewDone = toggleReviewPageDone;
         window.appRemoveBookmark = (p) => {
           state.bookmarks.delete(p);
           try { localStorage.setItem(CONFIG.STORAGE_KEYS.BOOKMARKS, JSON.stringify(Array.from(state.bookmarks))); } catch (e) {}
           updateSidebarBadges();
         };
+
+        // Chuyển tab chính (Sách / Ôn tập HK1)
+        if (DOM.btnMainTabBook) DOM.btnMainTabBook.addEventListener('click', () => switchMainTab('book'));
+        if (DOM.btnMainTabReview) DOM.btnMainTabReview.addEventListener('click', () => switchMainTab('review'));
+
+        // Sub-tabs trong khu vực Ôn tập HK1
+        document.querySelectorAll('.review-subtab-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.review-subtab-btn').forEach((b) => b.classList.remove('active'));
+            document.querySelectorAll('.review-panel').forEach((p) => p.classList.remove('active'));
+            btn.classList.add('active');
+            const target = document.getElementById(btn.dataset.reviewTab);
+            if (target) target.classList.add('active');
+          });
+        });
+
+        // Nút chấm điểm / xem đáp án / làm lại trong bài luyện tập
+        if (DOM.btnGradeQuiz) DOM.btnGradeQuiz.addEventListener('click', gradeReviewQuiz);
+        if (DOM.btnShowAnswers) DOM.btnShowAnswers.addEventListener('click', showReviewQuizAnswers);
+        if (DOM.btnResetQuiz) DOM.btnResetQuiz.addEventListener('click', resetReviewQuiz);
       }
 
       let toastTimer = null;
@@ -2181,6 +3374,8 @@
           if (n) state.notes = JSON.parse(n);
           const p = localStorage.getItem(CONFIG.STORAGE_KEYS.LAST_PAGE);
           if (p) state.currentPage = parseInt(p, 10) || 1;
+          const r = localStorage.getItem(CONFIG.STORAGE_KEYS.REVIEW_DONE);
+          if (r) state.completedReviewPages = new Set(JSON.parse(r));
         } catch (e) {}
 
         // 2. Khởi tạo IndexedDB
@@ -2188,6 +3383,9 @@
 
         // 3. Xây dựng giao diện
         buildThumbnails();
+        renderReviewUnits();
+        renderVocabCards();
+        renderQuizSections();
         updateSidebarBadges();
         setupPointerDrawingEvents();
         setupDrawingToolbarEvents();
