@@ -1427,6 +1427,55 @@
       color: var(--accent);
     }
 
+    /* Song ngữ (Bilingual Toggle & Subtitle) */
+    .review-hero-right {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 240px;
+      flex: 0 1 280px;
+    }
+
+    .bilingual-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 36px;
+      padding: 0 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.12);
+      color: #e0f2fe;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      touch-action: manipulation;
+    }
+
+    .bilingual-toggle-btn.active {
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #04121e;
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .vi-sub {
+      display: block;
+      font-size: 0.88em;
+      font-weight: 500;
+      color: #93c5fd;
+      margin-top: 2px;
+      font-style: italic;
+    }
+
+    .vi-inline {
+      color: #93c5fd;
+      font-weight: 500;
+      font-size: 0.9em;
+    }
+
     /* Responsive cho iPad dọc & Mobile */
     @media (max-width: 860px) {
       .app-title span.text { display: none; }
@@ -1462,13 +1511,13 @@
         <span class="badge book-only-ctrl">112 Trang</span>
       </div>
 
-      <!-- CHUYỂN TAB CHÍNH: SÁCH TOÁN / ÔN TẬP HK1 -->
-      <div class="main-tab-switcher" role="tablist" aria-label="Chuyển chế độ học">
-        <button id="btnMainTabBook" class="main-tab-btn active" data-main-tab="book" title="Đọc & viết trực tiếp lên sách">
-          📖 <span>Sách</span>
+      <!-- CHUYỂN TAB CHÍNH: BOOK / REVIEW TERM 1 -->
+      <div class="main-tab-switcher" role="tablist" aria-label="Switch mode">
+        <button id="btnMainTabBook" class="main-tab-btn active" data-main-tab="book" title="Read & write on book">
+          📖 <span id="mainTabBookLabel">Book</span>
         </button>
-        <button id="btnMainTabReview" class="main-tab-btn review-tab-btn" data-main-tab="review" title="Đề cương & Luyện tập Cuối HK1">
-          ⭐ <span>Ôn tập HK1</span>
+        <button id="btnMainTabReview" class="main-tab-btn review-tab-btn" data-main-tab="review" title="Final Term 1 Math Review">
+          ⭐ <span id="mainTabReviewLabel">Review T1</span>
         </button>
       </div>
 
@@ -1693,59 +1742,64 @@
   </main>
 
   <!-- ==========================================================================
-       TAB RIÊNG: ÔN TẬP CUỐI HỌC KÌ 1 (STARTERS 2 - MATH 2A)
+       TAB RIÊNG: FINAL TERM 1 REVIEW (STARTERS 2 - MATH 2A)
        ========================================================================== -->
-  <section id="reviewWorkspace" class="review-workspace" aria-label="Ôn tập cuối học kì 1">
+  <section id="reviewWorkspace" class="review-workspace" aria-label="Final Term 1 Review">
     <div class="review-container">
-      <!-- Banner & Tiến độ -->
+      <!-- Banner, Bilingual Toggle & Progress -->
       <div class="review-hero">
-        <div>
-          <h1>⭐ Ôn Tập Cuối Học Kì 1 — Math 2A</h1>
-          <p>Chương trình <strong>Starters 2 (2026–2027)</strong> • <em>Macmillan Mathematics 2A</em><br>
-          Chạm vào số trang để mở thẳng trang sách viết bằng Apple Pencil, hoặc luyện làm bài chấm điểm ngay tại đây!</p>
+        <div style="flex:1;min-width:260px;">
+          <h1 id="reviewHeroTitle">⭐ Final Term 1 Review — Math 2A</h1>
+          <p id="reviewHeroDesc"><strong>Starters 2 (2026–2027)</strong> • <em>Macmillan Mathematics 2A</em><br>
+          Tap any page number to open it directly in the book for Apple Pencil practice, or take the interactive quiz below!</p>
         </div>
-        <div class="review-progress-box">
-          <div class="review-progress-top">
-            <span>Tiến độ ôn sách</span>
-            <span id="reviewProgressText">0 / 23 trang (0%)</span>
-          </div>
-          <div class="review-progress-bar">
-            <div id="reviewProgressFill" class="review-progress-fill"></div>
+        <div class="review-hero-right">
+          <button id="btnToggleBilingual" class="bilingual-toggle-btn" title="Toggle English / Bilingual (EN + VI)">
+            🌐 <span id="bilingualBtnLabel">English Only (Bật Song ngữ)</span>
+          </button>
+          <div class="review-progress-box">
+            <div class="review-progress-top">
+              <span id="reviewProgressLabel">Study Progress</span>
+              <span id="reviewProgressText">0 / 23 pages (0%)</span>
+            </div>
+            <div class="review-progress-bar">
+              <div id="reviewProgressFill" class="review-progress-fill"></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- 3 Sub-tabs trong khu vực Ôn tập -->
+      <!-- 3 Sub-tabs -->
       <div class="review-subtabs" role="tablist">
-        <button class="review-subtab-btn active" data-review-tab="panelGuide">📚 Đề cương & Trang sách</button>
-        <button class="review-subtab-btn" data-review-tab="panelVocab">🔤 Từ vựng Toán (19 thẻ)</button>
-        <button class="review-subtab-btn" data-review-tab="panelQuiz">🎯 Luyện đề & Chấm điểm</button>
+        <button id="subtabGuide" class="review-subtab-btn active" data-review-tab="panelGuide">📚 Study Guide & Pages</button>
+        <button id="subtabVocab" class="review-subtab-btn" data-review-tab="panelVocab">🔤 Math Vocabulary (19)</button>
+        <button id="subtabQuiz" class="review-subtab-btn" data-review-tab="panelQuiz">🎯 Practice Quiz</button>
       </div>
 
-      <!-- PANEL 1: ĐỀ CƯƠNG & LỘ TRÌNH TRANG SÁCH -->
+      <!-- PANEL 1: STUDY GUIDE & BOOK PAGES -->
       <div id="panelGuide" class="review-panel active">
-        <div class="review-note-banner">
-          📌 <strong>Lưu ý phạm vi thi:</strong> Không thi phần <em>Try this</em> (Tr. 41, 43, 45, 47, 51), không thi <em>Assessment</em> (Tr. 49), bỏ qua Tr. 53, 59, 61 và Ex 2 Tr. 60.
+        <div id="reviewScopeBanner" class="review-note-banner">
+          📌 <strong>Exam Scope Note:</strong> Excludes <em>Try this</em> (p. 41, 43, 45, 47, 51), <em>Assessment</em> (p. 49), pages 53, 59, 61, and Ex 2 on p. 60.
         </div>
         <div id="reviewUnitsContainer" style="display:flex;flex-direction:column;gap:16px;"></div>
       </div>
 
-      <!-- PANEL 2: TỪ VỰNG TOÁN HỌC (FLASHCARDS) -->
+      <!-- PANEL 2: MATH VOCABULARY FLASHCARDS -->
       <div id="panelVocab" class="review-panel">
-        <div class="review-note-banner" style="background:rgba(56,189,248,0.1);border-color:rgba(56,189,248,0.3);color:#bae6fd;">
-          💡 <strong>Mẹo học từ vựng:</strong> Chạm vào từng thẻ để lật xem nghĩa tiếng Việt và ví dụ trong sách Toán!
+        <div id="reviewVocabBanner" class="review-note-banner" style="background:rgba(56,189,248,0.1);border-color:rgba(56,189,248,0.3);color:#bae6fd;">
+          💡 <strong>Tip:</strong> Tap any card to flip and see its meaning and example from the textbook!
         </div>
         <div id="vocabGrid" class="vocab-grid"></div>
       </div>
 
-      <!-- PANEL 3: LUYỆN ĐỀ TRỰC TUYẾN & CHẤM ĐIỂM -->
+      <!-- PANEL 3: INTERACTIVE PRACTICE QUIZ -->
       <div id="panelQuiz" class="review-panel">
         <div class="quiz-toolbar">
-          <div id="quizScoreBadge" class="quiz-score-badge">Điền đáp án rồi nhấn "Chấm điểm" nhé! 🌟</div>
+          <div id="quizScoreBadge" class="quiz-score-badge">Fill in the answers and tap "Check Answers"! 🌟</div>
           <div class="quiz-actions">
-            <button id="btnGradeQuiz" class="btn" style="background:var(--success-color);color:#042f2e;font-weight:700;">✅ Chấm điểm</button>
-            <button id="btnShowAnswers" class="btn" style="background:rgba(245,158,11,0.2);color:#fbbf24;border-color:rgba(245,158,11,0.4);">👁 Xem đáp án</button>
-            <button id="btnResetQuiz" class="btn">🔄 Làm lại</button>
+            <button id="btnGradeQuiz" class="btn" style="background:var(--success-color);color:#042f2e;font-weight:700;">✅ Check Answers</button>
+            <button id="btnShowAnswers" class="btn" style="background:rgba(245,158,11,0.2);color:#fbbf24;border-color:rgba(245,158,11,0.4);">👁 Show Answers</button>
+            <button id="btnResetQuiz" class="btn">🔄 Reset</button>
           </div>
         </div>
         <div id="quizSectionsContainer" style="display:flex;flex-direction:column;gap:14px;"></div>
@@ -1804,60 +1858,77 @@
           NOTES: 'math2a_notes',
           VIEW_MODE: 'math2a_view_mode',
           COLOR_FILTER: 'math2a_color_filter',
-          REVIEW_DONE: 'math2a_review_done_v1'
+          REVIEW_DONE: 'math2a_review_done_v1',
+          REVIEW_BILINGUAL: 'math2a_review_bilingual_v1'
         }
       };
 
-      // --- DỮ LIỆU ĐỀ CƯƠNG ÔN TẬP CUỐI HK1 (STARTERS 2 - 2026-2027) ---
+      // --- FINAL TERM 1 REVIEW DATA (STARTERS 2 - 2026-2027) ---
       const REVIEW_UNITS = [
         {
           id: 'unit-5',
           badge: 'Unit 5',
-          title: 'Subtraction within 99 (Phép trừ trong phạm vi 99)',
+          title: 'Subtraction within 99',
+          titleVi: 'Phép trừ trong phạm vi 99',
           lessons: [
             {
-              name: '1. Subtraction within 20 (Trừ trong phạm vi 20)',
-              desc: 'Tìm hiệu (difference) giữa 2 số bằng cách đếm thêm (count on) trên tia số qua mốc 10.',
-              formula: 'Ví dụ: Hiệu của 8 và 17 → 8 lên 10 là 2, 10 lên 17 là 7 → 2 + 7 = 9 (hay 17 − 8 = 9).',
+              name: '1. Subtraction within 20',
+              nameVi: '1. Trừ trong phạm vi 20',
+              desc: 'Count on from the smaller number to the larger number on a number line to find the difference.',
+              descVi: 'Tìm hiệu (difference) giữa 2 số bằng cách đếm thêm (count on) trên tia số qua mốc 10.',
+              formula: 'Example: Difference between 8 and 17 → 8 to 10 is 2, 10 to 17 is 7 → 2 + 7 = 9 (17 − 8 = 9).',
+              formulaVi: 'Ví dụ: Hiệu của 8 và 17 → 8 lên 10 là 2, 10 lên 17 là 7 → 2 + 7 = 9 (hay 17 − 8 = 9).',
               pages: [
-                { page: 40, scope: 'Toàn bộ', note: 'Ex 1: Tìm hiệu trên tia số' },
-                { page: 41, scope: 'Ex 2, 3', note: 'Chỉ ôn Ex 2, 3 (bỏ Try this)' }
+                { page: 40, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 1: Find the difference on a number line', noteVi: 'Ex 1: Tìm hiệu trên tia số' },
+                { page: 41, scope: 'Ex 2, 3', scopeVi: 'Ex 2, 3', note: 'Ex 2, 3 only (skip Try this)', noteVi: 'Chỉ ôn Ex 2, 3 (bỏ Try this)' }
               ]
             },
             {
-              name: '2. Subtracting tens (Trừ các số tròn chục)',
-              desc: 'Dùng phép trừ trong phạm vi 10 để trừ các số tròn chục (tens).',
+              name: '2. Subtracting tens',
+              nameVi: '2. Trừ các số tròn chục',
+              desc: 'Use subtraction facts within 10 to help you subtract tens.',
+              descVi: 'Dùng phép trừ trong phạm vi 10 để trừ các số tròn chục (tens).',
               formula: '8 − 3 = 5  ⇒  8 tens − 3 tens = 5 tens  ⇒  80 − 30 = 50.',
+              formulaVi: '8 − 3 = 5  ⇒  8 chục − 3 chục = 5 chục  ⇒  80 − 30 = 50.',
               pages: [
-                { page: 42, scope: 'Toàn bộ', note: 'Ex 1: Trừ số tròn chục' },
-                { page: 43, scope: 'Ex 2, 3', note: 'Chỉ ôn Ex 2, 3 (bỏ Try this)' }
+                { page: 42, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 1: Subtracting tens', noteVi: 'Ex 1: Trừ số tròn chục' },
+                { page: 43, scope: 'Ex 2, 3', scopeVi: 'Ex 2, 3', note: 'Ex 2, 3 only (skip Try this)', noteVi: 'Chỉ ôn Ex 2, 3 (bỏ Try this)' }
               ]
             },
             {
-              name: '3. Subtracting: TU − U (Trừ số 2 chữ số cho số 1 chữ số)',
-              desc: 'Tách chục & đơn vị hoặc đặt tính theo cột (trừ hàng đơn vị trước, rồi hàng chục).',
+              name: '3. Subtracting: TU − U',
+              nameVi: '3. Trừ số có 2 chữ số cho số có 1 chữ số',
+              desc: 'Break up the 2-digit number into tens and units, or write in columns (subtract units first, then tens).',
+              descVi: 'Tách chục & đơn vị hoặc đặt tính theo cột (trừ hàng đơn vị trước, rồi hàng chục).',
               formula: '47 − 5 = 40 + (7 − 5) = 40 + 2 = 42.',
+              formulaVi: '47 − 5 = 40 + (7 − 5) = 40 + 2 = 42.',
               pages: [
-                { page: 44, scope: 'Toàn bộ', note: 'Ex 1: Tách chục và đơn vị' },
-                { page: 45, scope: 'Ex 2, 3', note: 'Chỉ ôn Ex 2, 3 (bỏ Try this)' }
+                { page: 44, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 1: Break into tens and units', noteVi: 'Ex 1: Tách chục và đơn vị' },
+                { page: 45, scope: 'Ex 2, 3', scopeVi: 'Ex 2, 3', note: 'Ex 2, 3 only (skip Try this)', noteVi: 'Chỉ ôn Ex 2, 3 (bỏ Try this)' }
               ]
             },
             {
-              name: '4. Subtracting TU and tens (Trừ số 2 chữ số cho số tròn chục)',
-              desc: 'Giữ nguyên hàng đơn vị, chỉ trừ hàng chục. Luyện máy trừ (Take away machines −40, −30).',
+              name: '4. Subtracting TU and tens',
+              nameVi: '4. Trừ số có 2 chữ số cho số tròn chục',
+              desc: 'Keep the units the same and subtract the tens. Practice with Take away machines (−40, −30).',
+              descVi: 'Giữ nguyên hàng đơn vị, chỉ trừ hàng chục. Luyện máy trừ (Take away machines −40, −30).',
               formula: '54 − 20 = (50 − 20) + 4 = 30 + 4 = 34.',
+              formulaVi: '54 − 20 = (50 − 20) + 4 = 30 + 4 = 34.',
               pages: [
-                { page: 46, scope: 'Toàn bộ', note: 'Ex 1: Che thanh chục để tính' },
-                { page: 47, scope: 'Ex 2, 3', note: 'Chỉ ôn Ex 2, 3 (bỏ Try this)' }
+                { page: 46, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 1: Cover the rods to subtract', noteVi: 'Ex 1: Che thanh chục để tính' },
+                { page: 47, scope: 'Ex 2, 3', scopeVi: 'Ex 2, 3', note: 'Ex 2, 3 only (skip Try this)', noteVi: 'Chỉ ôn Ex 2, 3 (bỏ Try this)' }
               ]
             },
             {
-              name: '5. Subtracting 2-digit numbers: no exchange (Trừ 2 số 2 chữ số không nhớ)',
-              desc: 'Đặt tính thẳng cột T U: Bước 1 trừ hàng đơn vị (units), Bước 2 trừ hàng chục (tens).',
-              formula: '67 − 35: Đơn vị 7 − 5 = 2, Chục 60 − 30 = 30 ⇒ 32.',
+              name: '5. Subtracting 2-digit numbers: no exchange',
+              nameVi: '5. Trừ hai số có 2 chữ số không nhớ',
+              desc: 'Write in T U columns: Step 1 subtract the units, Step 2 subtract the tens.',
+              descVi: 'Đặt tính thẳng cột T U: Bước 1 trừ hàng đơn vị (units), Bước 2 trừ hàng chục (tens).',
+              formula: '67 − 35: Units 7 − 5 = 2, Tens 60 − 30 = 30 ⇒ 32.',
+              formulaVi: '67 − 35: Đơn vị 7 − 5 = 2, Chục 60 − 30 = 30 ⇒ 32.',
               pages: [
-                { page: 48, scope: 'Toàn bộ', note: 'Ex 1: Trừ có hình minh họa' },
-                { page: 49, scope: 'Ex 2', note: 'Chỉ ôn Ex 2 (bỏ Assessment)' }
+                { page: 48, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 1: Subtract with base-10 rods', noteVi: 'Ex 1: Trừ có hình minh họa' },
+                { page: 49, scope: 'Ex 2', scopeVi: 'Ex 2', note: 'Ex 2 only (skip Assessment)', noteVi: 'Chỉ ôn Ex 2 (bỏ Assessment)' }
               ]
             }
           ]
@@ -1865,49 +1936,65 @@
         {
           id: 'unit-6',
           badge: 'Unit 6',
-          title: 'Multiplication (Phép nhân)',
+          title: 'Multiplication',
+          titleVi: 'Phép nhân',
           lessons: [
             {
-              name: '1. Grouping (Đếm theo nhóm)',
-              desc: 'Đếm số nhóm và số vật trong mỗi nhóm theo mẫu câu chuẩn của sách.',
-              formula: '5 groups of 3 makes 15 (5 nhóm, mỗi nhóm 3 đồ vật = 15).',
+              name: '1. Grouping',
+              nameVi: '1. Đếm theo nhóm',
+              desc: 'Group objects equally and count the groups to find the total altogether.',
+              descVi: 'Đếm số nhóm và số vật trong mỗi nhóm theo mẫu câu chuẩn của sách.',
+              formula: '5 groups of 3 makes 15.',
+              formulaVi: '5 nhóm, mỗi nhóm 3 đồ vật tạo thành 15.',
               pages: [
-                { page: 50, scope: 'Toàn bộ', note: 'Ex 1: Điền số nhóm & tổng' },
-                { page: 51, scope: 'Ex 2', note: 'Chỉ ôn Ex 2 (bỏ Try this)' }
+                { page: 50, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 1: Count groups & complete sentences', noteVi: 'Ex 1: Điền số nhóm & tổng' },
+                { page: 51, scope: 'Ex 2', scopeVi: 'Ex 2', note: 'Ex 2 only (skip Try this)', noteVi: 'Chỉ ôn Ex 2 (bỏ Try this)' }
               ]
             },
             {
-              name: '2. Repeated addition (Phép cộng lặp lại)',
-              desc: 'Cộng nhiều nhóm bằng nhau liên tiếp.',
-              formula: '3 nhóm 4 ⇒ 4 + 4 + 4 = 12.',
+              name: '2. Repeated addition',
+              nameVi: '2. Phép cộng lặp lại',
+              desc: 'Add equal groups together repeatedly to find the total.',
+              descVi: 'Cộng nhiều nhóm bằng nhau liên tiếp.',
+              formula: '3 groups of 4 ⇒ 4 + 4 + 4 = 12.',
+              formulaVi: '3 nhóm 4 ⇒ 4 + 4 + 4 = 12.',
               pages: [
-                { page: 52, scope: 'Toàn bộ', note: 'Ex 1: Cộng lặp lại (bỏ Tr. 53)' }
+                { page: 52, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 1: Repeated addition (skip p. 53)', noteVi: 'Ex 1: Cộng lặp lại (bỏ Tr. 53)' }
               ]
             },
             {
-              name: '3. Multiplying (Phép nhân với dấu ×)',
-              desc: 'Chuyển từ phép cộng lặp lại sang phép nhân bằng dấu × (multiplied by).',
+              name: '3. Multiplying',
+              nameVi: '3. Phép nhân với dấu ×',
+              desc: 'Use the multiplication sign (×) to write repeated addition as multiplication.',
+              descVi: 'Chuyển từ phép cộng lặp lại sang phép nhân bằng dấu × (multiplied by).',
               formula: '5 + 5 + 5 = 15  ⇒  5 multiplied by 3 = 15  ⇒  5 × 3 = 15.',
+              formulaVi: '5 + 5 + 5 = 15  ⇒  5 nhân 3 = 15  ⇒  5 × 3 = 15.',
               pages: [
-                { page: 54, scope: 'Toàn bộ', note: 'Ex 1: Phép cộng & multiplied by' },
-                { page: 55, scope: 'Toàn bộ', note: 'Ex 2, 3: Vẽ hạt & viết phép nhân' }
+                { page: 54, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 1: Repeated addition & multiplied by', noteVi: 'Ex 1: Phép cộng & multiplied by' },
+                { page: 55, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 2, 3: Draw seeds & multiply', noteVi: 'Ex 2, 3: Vẽ hạt & viết phép nhân' }
               ]
             },
             {
-              name: '4. Arrays (Mảng — Tính chất giao hoán)',
-              desc: 'Đếm theo hàng ngang hay cột dọc đều cho cùng một kết quả.',
-              formula: '3 × 4 = 12 và 4 × 3 = 12 (3 × 4 có cùng đáp án với 4 × 3).',
+              name: '4. Arrays',
+              nameVi: '4. Mảng (Tính chất giao hoán)',
+              desc: 'Objects in rows and columns can be counted either way and give the same answer.',
+              descVi: 'Đếm theo hàng ngang hay cột dọc đều cho cùng một kết quả.',
+              formula: '3 × 4 = 12 has the same answer as 4 × 3 = 12.',
+              formulaVi: '3 × 4 = 12 có cùng đáp án với 4 × 3 = 12.',
               pages: [
-                { page: 56, scope: 'Toàn bộ', note: 'Ex 1: Tính phép nhân từ hình' },
-                { page: 57, scope: 'Toàn bộ', note: 'Ex 2, 3: Viết & khoanh nhóm phép nhân' }
+                { page: 56, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 1: Multiply from picture groups', noteVi: 'Ex 1: Tính phép nhân từ hình' },
+                { page: 57, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 2, 3: Write & group multiplications', noteVi: 'Ex 2, 3: Viết & khoanh nhóm phép nhân' }
               ]
             },
             {
-              name: '5. Multiplying by 1 and 0 (Nhân với 1 và 0)',
-              desc: 'Số nào nhân với 1 cũng bằng chính nó. Số nào nhân với 0 cũng bằng 0.',
+              name: '5. Multiplying by 1 and 0',
+              nameVi: '5. Nhân với 1 và 0',
+              desc: 'Any number multiplied by 1 stays the same. Any number multiplied by 0 equals 0.',
+              descVi: 'Số nào nhân với 1 cũng bằng chính nó. Số nào nhân với 0 cũng bằng 0.',
               formula: '6 × 1 = 6  |  1 × 6 = 6  |  6 × 0 = 0  |  0 × 6 = 0.',
+              formulaVi: '6 × 1 = 6  |  1 × 6 = 6  |  6 × 0 = 0  |  0 × 6 = 0.',
               pages: [
-                { page: 58, scope: 'Toàn bộ', note: 'Ex 1: Nhân 1 và 0 (bỏ Tr. 59)' }
+                { page: 58, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 1: Multiply by 1 and 0 (skip p. 59)', noteVi: 'Ex 1: Nhân 1 và 0 (bỏ Tr. 59)' }
               ]
             }
           ]
@@ -1915,33 +2002,43 @@
         {
           id: 'unit-7',
           badge: 'Unit 7',
-          title: 'Number facts (Bảng cộng, trừ, nhân cơ bản)',
+          title: 'Number facts',
+          titleVi: 'Các bảng cộng, trừ, nhân cơ bản',
           lessons: [
             {
-              name: '1. Adding to 20 — Near doubles (Cộng nhẩm gần số nhân đôi)',
-              desc: 'Dùng phép cộng 2 số giống nhau rồi cộng thêm 1 để tính nhanh.',
-              formula: '4 + 4 = 8 ⇒ 4 + 5 = 9  |  6 + 6 = 12 ⇒ 6 + 7 = 13.',
+              name: '1. Adding to 20 — Near doubles',
+              nameVi: '1. Cộng trong phạm vi 20 — Gần số nhân đôi',
+              desc: 'Use a double fact you know and add 1 more to find the near double.',
+              descVi: 'Dùng phép cộng 2 số giống nhau rồi cộng thêm 1 để tính nhanh.',
+              formula: '4 + 4 = 8 ⇒ 4 + 5 is 1 more ⇒ 9  |  6 + 6 = 12 ⇒ 6 + 7 = 13.',
+              formulaVi: '4 + 4 = 8 ⇒ 4 + 5 thêm 1 là 9  |  6 + 6 = 12 ⇒ 6 + 7 = 13.',
               pages: [
-                { page: 60, scope: 'Ex 1', note: 'Chỉ ôn Ex 1 (bỏ Ex 2 & Tr. 61)' }
+                { page: 60, scope: 'Ex 1', scopeVi: 'Ex 1', note: 'Ex 1 only (skip Ex 2 & p. 61)', noteVi: 'Chỉ ôn Ex 1 (bỏ Ex 2 & Tr. 61)' }
               ]
             },
             {
-              name: '2. Addition and subtraction trios (Bộ ba số cộng – trừ)',
-              desc: 'Phép trừ là phép toán ngược (inverse) của phép cộng. 1 bộ 3 số lập được 4 phép tính.',
-              formula: 'Bộ ba (4, 7, 11) ⇒ 4 + 7 = 11, 7 + 4 = 11, 11 − 4 = 7, 11 − 7 = 4.',
+              name: '2. Addition and subtraction trios',
+              nameVi: '2. Bộ ba số cộng – trừ',
+              desc: 'Subtraction is the inverse of addition. Each trio of 3 numbers makes 4 related facts.',
+              descVi: 'Phép trừ là phép toán ngược (inverse) của phép cộng. 1 bộ 3 số lập được 4 phép tính.',
+              formula: 'Trio (4, 7, 11) ⇒ 4 + 7 = 11, 7 + 4 = 11, 11 − 4 = 7, 11 − 7 = 4.',
+              formulaVi: 'Bộ ba (4, 7, 11) ⇒ 4 + 7 = 11, 7 + 4 = 11, 11 − 4 = 7, 11 − 7 = 4.',
               pages: [
-                { page: 62, scope: 'Toàn bộ', note: 'Ex 1: Viết 4 phép tính bộ ba số' },
-                { page: 63, scope: 'Toàn bộ', note: 'Ex 2, 3: Điền ô trống & phép tính ngược' }
+                { page: 62, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 1: Write 4 facts for each trio', noteVi: 'Ex 1: Viết 4 phép tính bộ ba số' },
+                { page: 63, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 2, 3: Missing numbers & inverse facts', noteVi: 'Ex 2, 3: Điền ô trống & phép tính ngược' }
               ]
             },
             {
-              name: '3. Multiplication facts for 2 and 4 (Bảng nhân 2 và bảng nhân 4)',
-              desc: 'Bảng nhân 4 bằng gấp đôi (double) bảng nhân 2 và luôn là số chẵn (even numbers).',
+              name: '3. Multiplication facts for 2 and 4',
+              nameVi: '3. Bảng nhân 2 và bảng nhân 4',
+              desc: 'The numbers in the 4 times table are double the 2 times table. They are always even numbers.',
+              descVi: 'Bảng nhân 4 bằng gấp đôi (double) bảng nhân 2 và luôn là số chẵn (even numbers).',
               formula: '2 × 3 = 6 → double → 4 × 3 = 12  |  2 × 5 = 10 → double → 4 × 5 = 20.',
+              formulaVi: '2 × 3 = 6 → gấp đôi → 4 × 3 = 12  |  2 × 5 = 10 → gấp đôi → 4 × 5 = 20.',
               hasTimesTable: true,
               pages: [
-                { page: 64, scope: 'Toàn bộ', note: 'Ex 1: Bảng nhân 2 và nhân 4' },
-                { page: 65, scope: 'Toàn bộ', note: 'Ex 2, 3: Dãy số (+2, +4) & tính nhanh' }
+                { page: 64, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 1: 2 times & 4 times table', noteVi: 'Ex 1: Bảng nhân 2 và nhân 4' },
+                { page: 65, scope: 'All', scopeVi: 'Toàn bộ', note: 'Ex 2, 3: Number sequences (+2, +4) & facts', noteVi: 'Ex 2, 3: Dãy số (+2, +4) & tính nhanh' }
               ]
             }
           ]
@@ -1949,30 +2046,31 @@
       ];
 
       const REVIEW_VOCAB = [
-        { en: 'subtraction / subtract', vi: 'phép trừ / trừ đi', ex: 'Subtract the units, then subtract the tens.' },
-        { en: 'difference', vi: 'hiệu (kết quả phép trừ)', ex: 'What is the difference between 8 and 17?' },
-        { en: 'count on', vi: 'đếm thêm', ex: 'Count on from 8 to 17.' },
-        { en: 'number line', vi: 'tia số', ex: 'Use the number line to help.' },
-        { en: 'tens (T) / units (U)', vi: 'hàng chục / hàng đơn vị', ex: 'Break up 47 into tens and units.' },
-        { en: 'rods', vi: 'thanh chục (10 ô)', ex: 'Cross out / Cover the rods.' },
-        { en: 'take away', vi: 'bớt đi, lấy đi (trừ)', ex: 'Take away machines (-40, -30).' },
-        { en: 'no exchange', vi: 'không nhớ (không mượn)', ex: 'Subtracting 2-digit numbers: no exchange.' },
-        { en: 'multiplication / multiply', vi: 'phép nhân / nhân với', ex: '5 multiplied by 3 = 15 (5 × 3 = 15).' },
-        { en: 'grouping / groups of', vi: 'nhóm / nhóm gồm ...', ex: '5 groups of 3 makes 15.' },
-        { en: 'altogether', vi: 'tất cả, tổng cộng', ex: 'How many balloons are there altogether?' },
-        { en: 'repeated addition', vi: 'phép cộng lặp lại', ex: '4 + 4 + 4 = 12.' },
-        { en: 'arrays / rows', vi: 'mảng / các hàng', ex: 'These lettuces are planted in rows.' },
-        { en: 'near doubles', vi: 'gần số nhân đôi', ex: '4 + 4 = 8 → 4 + 5 is 1 more → 9.' },
-        { en: 'trios', vi: 'bộ ba số (cộng – trừ)', ex: '4, 7, 11 → 4 + 7 = 11, 11 - 4 = 7.' },
-        { en: 'inverse', vi: 'phép toán ngược', ex: 'Subtraction is the inverse of addition.' },
-        { en: 'times table', vi: 'bảng nhân', ex: '2 times table, 4 times table.' },
-        { en: 'double', vi: 'gấp đôi', ex: '4 times table is double the 2 times table.' },
-        { en: 'even numbers / sequence', vi: 'số chẵn / dãy số', ex: 'Write the next two numbers in each sequence.' }
+        { en: 'subtraction / subtract', enDef: 'Taking one number away from another (−)', vi: 'phép trừ / trừ đi', ex: 'Subtract the units, then subtract the tens.' },
+        { en: 'difference', enDef: 'The answer when you subtract two numbers', vi: 'hiệu (kết quả phép trừ)', ex: 'What is the difference between 8 and 17?' },
+        { en: 'count on', enDef: 'Start at the smaller number and count forward', vi: 'đếm thêm', ex: 'Count on from 8 to 17.' },
+        { en: 'number line', enDef: 'A straight line with numbers marked in order', vi: 'tia số', ex: 'Use the number line to help.' },
+        { en: 'tens (T) / units (U)', enDef: 'Place values in a 2-digit number (e.g. 47 = 4T + 7U)', vi: 'hàng chục / hàng đơn vị', ex: 'Break up 47 into tens and units.' },
+        { en: 'rods', enDef: 'Base-10 sticks; each rod equals 10 units', vi: 'thanh chục (10 ô)', ex: 'Cross out / Cover the rods.' },
+        { en: 'take away', enDef: 'Remove or subtract a number', vi: 'bớt đi, lấy đi (trừ)', ex: 'Take away machines (-40, -30).' },
+        { en: 'no exchange', enDef: 'Subtracting without borrowing from the tens', vi: 'không nhớ (không mượn)', ex: 'Subtracting 2-digit numbers: no exchange.' },
+        { en: 'multiplication / multiply', enDef: 'Adding equal groups using the × sign', vi: 'phép nhân / nhân với', ex: '5 multiplied by 3 = 15 (5 × 3 = 15).' },
+        { en: 'grouping / groups of', enDef: 'Putting objects into equal-sized sets', vi: 'nhóm / nhóm gồm ...', ex: '5 groups of 3 makes 15.' },
+        { en: 'altogether', enDef: 'The total number when all are counted', vi: 'tất cả, tổng cộng', ex: 'How many balloons are there altogether?' },
+        { en: 'repeated addition', enDef: 'Adding the same number over and over', vi: 'phép cộng lặp lại', ex: '4 + 4 + 4 = 12.' },
+        { en: 'arrays / rows', enDef: 'Objects arranged in equal rows and columns', vi: 'mảng / các hàng', ex: 'These lettuces are planted in rows.' },
+        { en: 'near doubles', enDef: 'Adding two numbers that are 1 apart (e.g. 4 + 5)', vi: 'gần số nhân đôi', ex: '4 + 4 = 8 → 4 + 5 is 1 more → 9.' },
+        { en: 'trios', enDef: 'Three numbers linked by addition and subtraction', vi: 'bộ ba số (cộng – trừ)', ex: '4, 7, 11 → 4 + 7 = 11, 11 - 4 = 7.' },
+        { en: 'inverse', enDef: 'The opposite operation (+ and −)', vi: 'phép toán ngược', ex: 'Subtraction is the inverse of addition.' },
+        { en: 'times table', enDef: 'A list of multiplication facts for a number', vi: 'bảng nhân', ex: '2 times table, 4 times table.' },
+        { en: 'double', enDef: 'Two times as much (multiply by 2)', vi: 'gấp đôi', ex: '4 times table is double the 2 times table.' },
+        { en: 'even numbers / sequence', enDef: 'Numbers ending in 0, 2, 4, 6, 8 / ordered pattern', vi: 'số chẵn / dãy số', ex: 'Write the next two numbers in each sequence.' }
       ];
 
       const REVIEW_QUIZ_SECTIONS = [
         {
-          title: 'Unit 5 • Bài 1: Trừ trong phạm vi 20 & Trừ số tròn chục',
+          title: 'Unit 5 • Ex 1: Subtraction within 20 & Subtracting tens',
+          titleVi: 'Unit 5 • Bài 1: Trừ trong phạm vi 20 & Trừ số tròn chục',
           items: [
             { label: 'a) Difference between 9 and 16 =', ans: 7 },
             { label: 'b) Difference between 7 and 15 =', ans: 8 },
@@ -1983,18 +2081,20 @@
           ]
         },
         {
-          title: 'Unit 5 • Bài 2: Trừ TU − U, TU − tens & 2 chữ số không nhớ',
+          title: 'Unit 5 • Ex 2: Subtracting TU − U, TU − tens & 2-digit (no exchange)',
+          titleVi: 'Unit 5 • Bài 2: Trừ TU − U, TU − tens & 2 chữ số không nhớ',
           items: [
             { label: 'a) 69 − 5 =', ans: 64 },
             { label: 'b) 87 − 40 =', ans: 47 },
             { label: 'c) 78 − 35 =', ans: 43 },
             { label: 'd) 96 − 62 =', ans: 34 },
-            { label: 'e) Máy −30: 54 →', ans: 24 },
-            { label: 'f) Máy −40: 88 →', ans: 48 }
+            { label: 'e) Take away (−30): 54 →', ans: 24 },
+            { label: 'f) Take away (−40): 88 →', ans: 48 }
           ]
         },
         {
-          title: 'Unit 6 • Bài 3: Nhóm (Grouping), Cộng lặp lại & Phép nhân',
+          title: 'Unit 6 • Ex 3: Grouping, Repeated addition & Multiplying',
+          titleVi: 'Unit 6 • Bài 3: Nhóm (Grouping), Cộng lặp lại & Phép nhân',
           items: [
             { label: 'a) 4 groups of 3 makes', ans: 12 },
             { label: 'b) 3 groups of 10 makes', ans: 30 },
@@ -2005,7 +2105,8 @@
           ]
         },
         {
-          title: 'Unit 6 • Bài 4: Nhân với 1 và 0 (Điền số còn thiếu)',
+          title: 'Unit 6 • Ex 4: Multiplying by 1 and 0 (Find the missing number)',
+          titleVi: 'Unit 6 • Bài 4: Nhân với 1 và 0 (Điền số còn thiếu)',
           items: [
             { label: 'a) 7 × 1 =', ans: 7 },
             { label: 'b) 9 × 0 =', ans: 0 },
@@ -2016,7 +2117,8 @@
           ]
         },
         {
-          title: 'Unit 7 • Bài 5: Near doubles & Bộ ba số (Trios)',
+          title: 'Unit 7 • Ex 5: Near doubles & Addition/Subtraction trios',
+          titleVi: 'Unit 7 • Bài 5: Gần số nhân đôi & Bộ ba số cộng – trừ',
           items: [
             { label: 'a) 6 + 6 = 12 ⇒ 6 + 7 =', ans: 13 },
             { label: 'b) 8 + 8 = 16 ⇒ 8 + 9 =', ans: 17 },
@@ -2027,14 +2129,15 @@
           ]
         },
         {
-          title: 'Unit 7 • Bài 6: Bảng nhân 2, Bảng nhân 4 & Dãy số (Sequences)',
+          title: 'Unit 7 • Ex 6: 2 & 4 times tables & Number sequences',
+          titleVi: 'Unit 7 • Bài 6: Bảng nhân 2, Bảng nhân 4 & Dãy số',
           items: [
             { label: 'a) 2 × 6 = 12 ⇒ 4 × 6 =', ans: 24 },
             { label: 'b) 2 × 9 = 18 ⇒ 4 × 9 =', ans: 36 },
             { label: 'c) 2 × 7 = 14 ⇒ 4 × 7 =', ans: 28 },
             { label: 'd) 4 × 5 = 2 × 10 =', ans: 20 },
-            { label: 'e) Dãy 4, 6, 8, 10, ... (số tiếp theo)', ans: 12 },
-            { label: 'f) Dãy 12, 16, 20, 24, ... (số tiếp theo)', ans: 28 }
+            { label: 'e) Sequence: 4, 6, 8, 10, ... (next)', ans: 12 },
+            { label: 'f) Sequence: 12, 16, 20, 24, ... (next)', ans: 28 }
           ]
         }
       ];
@@ -2064,6 +2167,7 @@
         pagesWithInk: new Set(), // Danh sách các trang có nét vẽ
         activeMainTab: 'book', // 'book' | 'review'
         completedReviewPages: new Set(),
+        reviewBilingual: false, // false = English Only, true = Bilingual (EN + VI)
         // Drawing engine state
         isDrawingMode: true,
         activeTool: 'pen', // 'pen' | 'highlighter' | 'eraser'
@@ -2138,6 +2242,16 @@
         btnMainTabBook: document.getElementById('btnMainTabBook'),
         btnMainTabReview: document.getElementById('btnMainTabReview'),
         reviewWorkspace: document.getElementById('reviewWorkspace'),
+        btnToggleBilingual: document.getElementById('btnToggleBilingual'),
+        bilingualBtnLabel: document.getElementById('bilingualBtnLabel'),
+        reviewHeroTitle: document.getElementById('reviewHeroTitle'),
+        reviewHeroDesc: document.getElementById('reviewHeroDesc'),
+        reviewProgressLabel: document.getElementById('reviewProgressLabel'),
+        subtabGuide: document.getElementById('subtabGuide'),
+        subtabVocab: document.getElementById('subtabVocab'),
+        subtabQuiz: document.getElementById('subtabQuiz'),
+        reviewScopeBanner: document.getElementById('reviewScopeBanner'),
+        reviewVocabBanner: document.getElementById('reviewVocabBanner'),
         sidebarReviewList: document.getElementById('sidebarReviewList'),
         reviewUnitsContainer: document.getElementById('reviewUnitsContainer'),
         vocabGrid: document.getElementById('vocabGrid'),
@@ -2910,8 +3024,99 @@
       }
 
       // ==========================================================================
-      // 8.5. TAB ÔN TẬP CUỐI HK1 (LỘ TRÌNH, FLASHCARD, LUYỆN ĐỀ CHẤM ĐIỂM)
+      // 8.5. FINAL TERM 1 REVIEW HUB (ENGLISH + OPTIONAL BILINGUAL EN/VI)
       // ==========================================================================
+      function biBlock(en, vi) {
+        if (!state.reviewBilingual || !vi) return en;
+        return `${en}<span class="vi-sub">${vi}</span>`;
+      }
+
+      function biInline(en, vi) {
+        if (!state.reviewBilingual || !vi) return en;
+        return `${en} <span class="vi-inline">(${vi})</span>`;
+      }
+
+      function toggleReviewBilingual() {
+        state.reviewBilingual = !state.reviewBilingual;
+        try {
+          localStorage.setItem(CONFIG.STORAGE_KEYS.REVIEW_BILINGUAL, state.reviewBilingual ? '1' : '0');
+        } catch (e) {}
+        applyReviewLanguageUI();
+        showToast(state.reviewBilingual ? 'Bilingual mode ON (Song ngữ EN + VI)' : 'English Only mode');
+      }
+
+      function applyReviewLanguageUI() {
+        const bi = state.reviewBilingual;
+        if (DOM.btnToggleBilingual) {
+          DOM.btnToggleBilingual.classList.toggle('active', bi);
+        }
+        if (DOM.bilingualBtnLabel) {
+          DOM.bilingualBtnLabel.textContent = bi ? 'Bilingual: EN + VI (Đang bật)' : 'English Only (Bật Song ngữ)';
+        }
+        if (DOM.reviewHeroTitle) {
+          DOM.reviewHeroTitle.innerHTML = bi
+            ? '⭐ Final Term 1 Review — Math 2A <span class="vi-inline">(Ôn tập Cuối HK1)</span>'
+            : '⭐ Final Term 1 Review — Math 2A';
+        }
+        if (DOM.reviewHeroDesc) {
+          DOM.reviewHeroDesc.innerHTML = bi
+            ? '<strong>Starters 2 (2026–2027)</strong> • <em>Macmillan Mathematics 2A</em><br>Tap any page number to open it directly in the book for Apple Pencil practice, or take the quiz below!<span class="vi-sub">Chạm số trang để mở thẳng trang sách viết Apple Pencil, hoặc luyện đề chấm điểm bên dưới!</span>'
+            : '<strong>Starters 2 (2026–2027)</strong> • <em>Macmillan Mathematics 2A</em><br>Tap any page number to open it directly in the book for Apple Pencil practice, or take the interactive quiz below!';
+        }
+        if (DOM.reviewProgressLabel) {
+          DOM.reviewProgressLabel.textContent = bi ? 'Study Progress / Tiến độ' : 'Study Progress';
+        }
+        if (DOM.subtabGuide) DOM.subtabGuide.textContent = bi ? '📚 Study Guide / Đề cương' : '📚 Study Guide & Pages';
+        if (DOM.subtabVocab) DOM.subtabVocab.textContent = bi ? '🔤 Vocabulary / Từ vựng (19)' : '🔤 Math Vocabulary (19)';
+        if (DOM.subtabQuiz) DOM.subtabQuiz.textContent = bi ? '🎯 Practice Quiz / Luyện đề' : '🎯 Practice Quiz';
+
+        if (DOM.reviewScopeBanner) {
+          DOM.reviewScopeBanner.innerHTML = bi
+            ? '📌 <strong>Exam Scope Note:</strong> Excludes <em>Try this</em> (p. 41, 43, 45, 47, 51), <em>Assessment</em> (p. 49), pages 53, 59, 61, and Ex 2 on p. 60.<span class="vi-sub">Lưu ý: Không thi Try this (Tr. 41, 43, 45, 47, 51), Assessment (Tr. 49), bỏ Tr. 53, 59, 61 và Ex 2 Tr. 60.</span>'
+            : '📌 <strong>Exam Scope Note:</strong> Excludes <em>Try this</em> (p. 41, 43, 45, 47, 51), <em>Assessment</em> (p. 49), pages 53, 59, 61, and Ex 2 on p. 60.';
+        }
+        if (DOM.reviewVocabBanner) {
+          DOM.reviewVocabBanner.innerHTML = bi
+            ? '💡 <strong>Tip:</strong> Tap any card to flip and see its English & Vietnamese meaning plus example!<span class="vi-sub">Mẹo: Chạm từng thẻ để lật xem nghĩa tiếng Anh, tiếng Việt và ví dụ trong sách!</span>'
+            : '💡 <strong>Tip:</strong> Tap any card to flip and see its meaning and example from the textbook!';
+        }
+        if (DOM.btnGradeQuiz) DOM.btnGradeQuiz.textContent = bi ? '✅ Check / Chấm điểm' : '✅ Check Answers';
+        if (DOM.btnShowAnswers) DOM.btnShowAnswers.textContent = bi ? '👁 Answers / Đáp án' : '👁 Show Answers';
+        if (DOM.btnResetQuiz) DOM.btnResetQuiz.textContent = bi ? '🔄 Reset / Làm lại' : '🔄 Reset';
+
+        // Preserve any typed quiz values when re-rendering language
+        const savedVals = [];
+        if (DOM.quizSectionsContainer) {
+          DOM.quizSectionsContainer.querySelectorAll('.quiz-input').forEach((inp) => {
+            savedVals.push({
+              val: inp.value,
+              correct: inp.classList.contains('correct'),
+              wrong: inp.classList.contains('wrong')
+            });
+          });
+        }
+
+        renderReviewUnits();
+        renderVocabCards();
+        renderQuizSections();
+        renderSidebarReviewList();
+        updateReviewProgressUI();
+
+        if (savedVals.length > 0 && DOM.quizSectionsContainer) {
+          DOM.quizSectionsContainer.querySelectorAll('.quiz-input').forEach((inp, i) => {
+            if (savedVals[i]) {
+              inp.value = savedVals[i].val;
+              if (savedVals[i].correct) inp.classList.add('correct');
+              if (savedVals[i].wrong) inp.classList.add('wrong');
+            }
+          });
+        } else if (DOM.quizScoreBadge) {
+          DOM.quizScoreBadge.textContent = bi
+            ? 'Fill in the answers and tap "Check" (Điền đáp án rồi nhấn Chấm điểm)! 🌟'
+            : 'Fill in the answers and tap "Check Answers"! 🌟';
+        }
+      }
+
       function switchMainTab(tabName) {
         state.activeMainTab = tabName === 'review' ? 'review' : 'book';
         const isReview = state.activeMainTab === 'review';
@@ -2955,7 +3160,10 @@
         switchMainTab('book');
         goToPage(pageNumber);
         if (info) {
-          showToast(`Trang ${pageNumber} (${info.scope}) — ${info.note}`);
+          const msg = state.reviewBilingual
+            ? `Page ${pageNumber} (${info.scope}) — ${info.note} (${info.noteVi})`
+            : `Page ${pageNumber} (${info.scope}) — ${info.note}`;
+          showToast(msg);
         }
       }
 
@@ -2964,20 +3172,23 @@
         const total = ALL_REVIEW_PAGES.length;
         const done = ALL_REVIEW_PAGES.filter((p) => state.completedReviewPages.has(p.page)).length;
         const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-        DOM.reviewProgressText.textContent = `${done} / ${total} trang (${pct}%)`;
+        DOM.reviewProgressText.textContent = state.reviewBilingual
+          ? `${done} / ${total} pages (${pct}%)`
+          : `${done} / ${total} pages (${pct}%)`;
         DOM.reviewProgressFill.style.width = `${pct}%`;
       }
 
       function renderSidebarReviewList() {
         if (!DOM.sidebarReviewList) return;
+        const bi = state.reviewBilingual;
         let html = `
           <div style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
-            <span style="font-size:12px;font-weight:700;color:#fbbf24;">⭐ Đề cương HK1 (${ALL_REVIEW_PAGES.length} trang)</span>
-            <button class="btn" style="height:26px;padding:0 8px;font-size:11px;background:rgba(245,158,11,0.18);color:#fbbf24;border-color:rgba(245,158,11,0.35);" onclick="window.appSwitchMainTab('review')">Mở đầy đủ</button>
+            <span style="font-size:12px;font-weight:700;color:#fbbf24;">⭐ ${bi ? 'Review T1 / Ôn HK1' : 'Final Term 1'} (${ALL_REVIEW_PAGES.length}p)</span>
+            <button class="btn" style="height:26px;padding:0 8px;font-size:11px;background:rgba(245,158,11,0.18);color:#fbbf24;border-color:rgba(245,158,11,0.35);" onclick="window.appSwitchMainTab('review')">${bi ? 'Full / Mở đủ' : 'Open Hub'}</button>
           </div>
         `;
         REVIEW_UNITS.forEach((unit) => {
-          html += `<div class="sidebar-review-group"><div class="sidebar-review-title">${unit.badge}: ${unit.title.split('(')[0].trim()}</div>`;
+          html += `<div class="sidebar-review-group"><div class="sidebar-review-title">${unit.badge}: ${unit.title}</div>`;
           unit.lessons.forEach((lesson) => {
             lesson.pages.forEach((p) => {
               const isDone = state.completedReviewPages.has(p.page);
@@ -2986,13 +3197,13 @@
               html += `
                 <div class="sidebar-review-item ${isDone ? 'done' : ''} ${isCurrent ? 'active-page' : ''}" onclick="window.appOpenReviewPage(${p.page})">
                   <div style="display:flex;align-items:center;gap:8px;">
-                    <button class="page-pill-check" style="${isDone ? 'background:var(--success-color);border-color:var(--success-color);' : ''}" title="Đánh dấu đã ôn xong" onclick="event.stopPropagation(); window.appToggleReviewDone(${p.page})">${isDone ? '✓' : ''}</button>
+                    <button class="page-pill-check" style="${isDone ? 'background:var(--success-color);border-color:var(--success-color);' : ''}" title="Mark as done" onclick="event.stopPropagation(); window.appToggleReviewDone(${p.page})">${isDone ? '✓' : ''}</button>
                     <div>
-                      <div style="font-weight:700;color:var(--text-primary);">Trang ${p.page} <span class="page-pill-scope">• ${p.scope}</span></div>
-                      <div style="font-size:11px;color:var(--text-muted);">${p.note}</div>
+                      <div style="font-weight:700;color:var(--text-primary);">Page ${p.page} <span class="page-pill-scope">• ${p.scope}</span></div>
+                      <div style="font-size:11px;color:var(--text-muted);">${bi ? `${p.note} — ${p.noteVi}` : p.note}</div>
                     </div>
                   </div>
-                  ${hasInk ? '<span style="color:var(--success-color);font-weight:700;" title="Bé đã viết bài trên trang này">✎</span>' : ''}
+                  ${hasInk ? '<span style="color:var(--success-color);font-weight:700;" title="Has Apple Pencil notes">✎</span>' : ''}
                 </div>
               `;
             });
@@ -3015,9 +3226,9 @@
               <div class="unit-card-header">
                 <div class="unit-title">
                   <span class="unit-badge">${unit.badge}</span>
-                  <span>${unit.title}</span>
+                  <span>${biInline(unit.title, unit.titleVi)}</span>
                 </div>
-                <span style="font-size:12px;font-weight:700;color:var(--text-secondary);white-space:nowrap;">${unitDone}/${unitPages.length} trang</span>
+                <span style="font-size:12px;font-weight:700;color:var(--text-secondary);white-space:nowrap;">${unitDone}/${unitPages.length} pages</span>
               </div>
               <div class="unit-lessons">
           `;
@@ -3026,10 +3237,10 @@
             html += `
               <div class="lesson-box">
                 <div class="lesson-header">
-                  <div class="lesson-name">${lesson.name}</div>
+                  <div class="lesson-name">${biInline(lesson.name, lesson.nameVi)}</div>
                 </div>
-                <div class="lesson-desc">${lesson.desc}</div>
-                <div class="lesson-formula">${lesson.formula}</div>
+                <div class="lesson-desc">${biBlock(lesson.desc, lesson.descVi)}</div>
+                <div class="lesson-formula">${biBlock(lesson.formula, lesson.formulaVi)}</div>
             `;
 
             if (lesson.hasTimesTable) {
@@ -3048,9 +3259,9 @@
               const hasInk = state.pagesWithInk.has(p.page);
               html += `
                 <div class="page-pill ${isDone ? 'done' : ''}">
-                  <button class="page-pill-check" title="Đánh dấu đã ôn xong" onclick="window.appToggleReviewDone(${p.page})">${isDone ? '✓' : ''}</button>
-                  <button class="page-pill-open" title="Mở Trang ${p.page} trong sách để viết Apple Pencil" onclick="window.appOpenReviewPage(${p.page})">
-                    <span>Tr. ${p.page}</span>
+                  <button class="page-pill-check" title="Mark as completed" onclick="window.appToggleReviewDone(${p.page})">${isDone ? '✓' : ''}</button>
+                  <button class="page-pill-open" title="Open Page ${p.page} in book" onclick="window.appOpenReviewPage(${p.page})">
+                    <span>p. ${p.page}</span>
                     <span class="page-pill-scope">(${p.scope})</span>
                     ${hasInk ? '<span style="color:var(--success-color);">✎</span>' : ''}
                     <span style="opacity:0.65;">→</span>
@@ -3068,16 +3279,20 @@
 
       function renderVocabCards() {
         if (!DOM.vocabGrid) return;
+        const bi = state.reviewBilingual;
         let html = '';
         REVIEW_VOCAB.forEach((item, idx) => {
           html += `
             <div class="vocab-card" data-vocab-idx="${idx}">
               <div>
                 <div class="vocab-en">${item.en}</div>
-                <div class="vocab-vi" style="display:none;">👉 ${item.vi}</div>
+                <div class="vocab-vi" style="display:none;">
+                  <div style="color:#e2e8f0;font-weight:600;font-size:13px;">${item.enDef}</div>
+                  ${bi ? `<div style="color:#38bdf8;margin-top:4px;">👉 ${item.vi}</div>` : ''}
+                </div>
                 <div class="vocab-ex" style="display:none;">"${item.ex}"</div>
               </div>
-              <div class="vocab-hint">Chạm để xem nghĩa ↻</div>
+              <div class="vocab-hint">${bi ? 'Tap to flip / Chạm để lật ↻' : 'Tap to flip ↻'}</div>
             </div>
           `;
         });
@@ -3087,7 +3302,9 @@
             const flipped = card.classList.toggle('flipped');
             card.querySelector('.vocab-vi').style.display = flipped ? 'block' : 'none';
             card.querySelector('.vocab-ex').style.display = flipped ? 'block' : 'none';
-            card.querySelector('.vocab-hint').textContent = flipped ? 'Chạm để ẩn nghĩa ↻' : 'Chạm để xem nghĩa ↻';
+            card.querySelector('.vocab-hint').textContent = flipped
+              ? (bi ? 'Tap to hide / Chạm để ẩn ↻' : 'Tap to hide ↻')
+              : (bi ? 'Tap to flip / Chạm để lật ↻' : 'Tap to flip ↻');
           });
         });
       }
@@ -3099,7 +3316,7 @@
         REVIEW_QUIZ_SECTIONS.forEach((sec) => {
           html += `
             <div class="quiz-section">
-              <div class="quiz-section-title">${sec.title}</div>
+              <div class="quiz-section-title"><div>${biBlock(sec.title, sec.titleVi)}</div></div>
               <div class="quiz-items-grid">
           `;
           sec.items.forEach((item) => {
@@ -3132,12 +3349,16 @@
         });
         const total = inputs.length;
         const pct = Math.round((correct / total) * 100);
-        let praise = 'Cố lên con nhé! 💪';
-        if (pct === 100) praise = 'Xuất sắc tuyệt đối! 🏆🌟';
-        else if (pct >= 80) praise = 'Giỏi lắm con ơi! 🎉';
-        else if (pct >= 50) praise = 'Khá tốt rồi, xem lại các câu màu đỏ nhé! 👍';
-        DOM.quizScoreBadge.textContent = `Kết quả: ${correct} / ${total} câu đúng (${pct}%) — ${praise}`;
-        showToast(`Bé làm đúng ${correct}/${total} câu (${pct}%)!`);
+        let praiseEn = 'Keep trying, you can do it! 💪';
+        let praiseVi = 'Cố lên con nhé!';
+        if (pct === 100) { praiseEn = 'Perfect score! 🏆🌟'; praiseVi = 'Xuất sắc tuyệt đối!'; }
+        else if (pct >= 80) { praiseEn = 'Great job! 🎉'; praiseVi = 'Giỏi lắm con ơi!'; }
+        else if (pct >= 50) { praiseEn = 'Good effort! Check the red boxes 👍'; praiseVi = 'Khá tốt, xem lại các câu đỏ nhé!'; }
+
+        DOM.quizScoreBadge.textContent = state.reviewBilingual
+          ? `Score: ${correct}/${total} (${pct}%) — ${praiseEn} (${praiseVi})`
+          : `Score: ${correct} / ${total} (${pct}%) — ${praiseEn}`;
+        showToast(`Score: ${correct}/${total} (${pct}%)!`);
       }
 
       function showReviewQuizAnswers() {
@@ -3147,8 +3368,10 @@
           inp.classList.remove('wrong');
           inp.classList.add('correct');
         });
-        DOM.quizScoreBadge.textContent = `Đã hiện toàn bộ ${inputs.length} đáp án mẫu 👀`;
-        showToast('Đã điền toàn bộ đáp án mẫu');
+        DOM.quizScoreBadge.textContent = state.reviewBilingual
+          ? `Showing all ${inputs.length} answers (Đã hiện toàn bộ đáp án) 👀`
+          : `Showing all ${inputs.length} answers 👀`;
+        showToast('Answers revealed');
       }
 
       function resetReviewQuiz() {
@@ -3157,8 +3380,10 @@
           inp.value = '';
           inp.classList.remove('correct', 'wrong');
         });
-        DOM.quizScoreBadge.textContent = 'Điền đáp án rồi nhấn "Chấm điểm" nhé! 🌟';
-        showToast('Đã làm mới bài luyện tập!');
+        DOM.quizScoreBadge.textContent = state.reviewBilingual
+          ? 'Fill in the answers and tap "Check" (Điền đáp án rồi nhấn Chấm điểm)! 🌟'
+          : 'Fill in the answers and tap "Check Answers"! 🌟';
+        showToast('Quiz reset!');
       }
 
       // ==========================================================================
@@ -3336,6 +3561,7 @@
         // Chuyển tab chính (Sách / Ôn tập HK1)
         if (DOM.btnMainTabBook) DOM.btnMainTabBook.addEventListener('click', () => switchMainTab('book'));
         if (DOM.btnMainTabReview) DOM.btnMainTabReview.addEventListener('click', () => switchMainTab('review'));
+        if (DOM.btnToggleBilingual) DOM.btnToggleBilingual.addEventListener('click', toggleReviewBilingual);
 
         // Sub-tabs trong khu vực Ôn tập HK1
         document.querySelectorAll('.review-subtab-btn').forEach((btn) => {
@@ -3376,6 +3602,8 @@
           if (p) state.currentPage = parseInt(p, 10) || 1;
           const r = localStorage.getItem(CONFIG.STORAGE_KEYS.REVIEW_DONE);
           if (r) state.completedReviewPages = new Set(JSON.parse(r));
+          const biSaved = localStorage.getItem(CONFIG.STORAGE_KEYS.REVIEW_BILINGUAL);
+          if (biSaved === '1') state.reviewBilingual = true;
         } catch (e) {}
 
         // 2. Khởi tạo IndexedDB
@@ -3383,9 +3611,7 @@
 
         // 3. Xây dựng giao diện
         buildThumbnails();
-        renderReviewUnits();
-        renderVocabCards();
-        renderQuizSections();
+        applyReviewLanguageUI();
         updateSidebarBadges();
         setupPointerDrawingEvents();
         setupDrawingToolbarEvents();

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'math2a-v3';
+const CACHE_NAME = 'math2a-v4';
 
 const STATIC_ASSETS = [
   './',
