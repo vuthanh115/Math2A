@@ -1747,13 +1747,16 @@
         <span class="badge book-only-ctrl">112 Trang</span>
       </div>
 
-      <!-- CHUYỂN TAB CHÍNH: BOOK / REVIEW TERM 1 -->
+      <!-- CHUYỂN TAB CHÍNH: BOOK / REVIEW TERM 1 / TIMES TABLES -->
       <div class="main-tab-switcher" role="tablist" aria-label="Switch mode">
         <button id="btnMainTabBook" class="main-tab-btn active" data-main-tab="book" title="Read & write on book">
           📖 <span id="mainTabBookLabel">Book</span>
         </button>
         <button id="btnMainTabReview" class="main-tab-btn review-tab-btn" data-main-tab="review" title="Final Term 1 Math Review">
           ⭐ <span id="mainTabReviewLabel">Review T1</span>
+        </button>
+        <button id="btnMainTabTimes" class="main-tab-btn review-tab-btn" data-main-tab="times" title="Multiplication Tables (Bảng cửu chương)">
+          ✖️ <span id="mainTabTimesLabel">Times Tables</span>
         </button>
       </div>
 
@@ -2535,6 +2538,7 @@
         // Review Tab HK1
         btnMainTabBook: document.getElementById('btnMainTabBook'),
         btnMainTabReview: document.getElementById('btnMainTabReview'),
+        btnMainTabTimes: document.getElementById('btnMainTabTimes'),
         reviewWorkspace: document.getElementById('reviewWorkspace'),
         btnToggleBilingual: document.getElementById('btnToggleBilingual'),
         bilingualBtnLabel: document.getElementById('bilingualBtnLabel'),
@@ -3615,14 +3619,34 @@
         }
       }
 
+      function activateReviewSubtab(panelId) {
+        document.querySelectorAll('.review-subtab-btn').forEach((b) => {
+          b.classList.toggle('active', b.dataset.reviewTab === panelId);
+        });
+        document.querySelectorAll('.review-panel').forEach((p) => {
+          p.classList.toggle('active', p.id === panelId);
+        });
+      }
+
       function switchMainTab(tabName) {
-        state.activeMainTab = tabName === 'review' ? 'review' : 'book';
-        const isReview = state.activeMainTab === 'review';
+        const isTimes = tabName === 'times';
+        const isReview = tabName === 'review' || isTimes;
+        state.activeMainTab = isReview ? 'review' : 'book';
         document.body.classList.toggle('mode-review', isReview);
         DOM.btnMainTabBook.classList.toggle('active', !isReview);
-        DOM.btnMainTabReview.classList.toggle('active', isReview);
+        DOM.btnMainTabReview.classList.toggle('active', tabName === 'review');
+        if (DOM.btnMainTabTimes) DOM.btnMainTabTimes.classList.toggle('active', isTimes);
 
         if (isReview) {
+          if (isTimes) {
+            activateReviewSubtab('panelTimesTables');
+            renderTimesTablesUI();
+          } else {
+            const activeSub = document.querySelector('.review-subtab-btn.active');
+            if (activeSub && activeSub.dataset.reviewTab === 'panelTimesTables') {
+              activateReviewSubtab('panelGuide');
+            }
+          }
           updateReviewProgressUI();
         } else {
           setTimeout(() => {
@@ -4391,19 +4415,21 @@
           updateSidebarBadges();
         };
 
-        // Chuyển tab chính (Sách / Ôn tập HK1)
+        // Chuyển tab chính (Book / Review T1 / Times Tables)
         if (DOM.btnMainTabBook) DOM.btnMainTabBook.addEventListener('click', () => switchMainTab('book'));
         if (DOM.btnMainTabReview) DOM.btnMainTabReview.addEventListener('click', () => switchMainTab('review'));
+        if (DOM.btnMainTabTimes) DOM.btnMainTabTimes.addEventListener('click', () => switchMainTab('times'));
         if (DOM.btnToggleBilingual) DOM.btnToggleBilingual.addEventListener('click', toggleReviewBilingual);
 
         // Sub-tabs trong khu vực Ôn tập HK1
         document.querySelectorAll('.review-subtab-btn').forEach((btn) => {
           btn.addEventListener('click', () => {
-            document.querySelectorAll('.review-subtab-btn').forEach((b) => b.classList.remove('active'));
-            document.querySelectorAll('.review-panel').forEach((p) => p.classList.remove('active'));
-            btn.classList.add('active');
-            const target = document.getElementById(btn.dataset.reviewTab);
-            if (target) target.classList.add('active');
+            activateReviewSubtab(btn.dataset.reviewTab);
+            if (DOM.btnMainTabTimes) {
+              const isTimes = btn.dataset.reviewTab === 'panelTimesTables';
+              DOM.btnMainTabTimes.classList.toggle('active', isTimes);
+              DOM.btnMainTabReview.classList.toggle('active', !isTimes);
+            }
           });
         });
 
